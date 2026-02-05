@@ -1,0 +1,35 @@
+# DuckDB files
+*.duckdb
+*.duckdb.wal
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+
+# dbt
+dbt_project/target/
+dbt_project/dbt_packages/
+dbt_project/logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# Data - keep structure, ignore large files
+data/raw/*.csv
+data/processed/
+
+# Environment
+.env
+*.duckdb.backup
+data/raw/*.csv

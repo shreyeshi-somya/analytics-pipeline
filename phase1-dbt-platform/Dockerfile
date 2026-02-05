@@ -1,0 +1,31 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    wget \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install DuckDB CLI (ARM64 version for Apple Silicon)
+RUN wget https://github.com/duckdb/duckdb/releases/download/v0.10.0/duckdb_cli-linux-aarch64.zip && \
+    unzip duckdb_cli-linux-aarch64.zip && \
+    mv duckdb /usr/local/bin/ && \
+    rm duckdb_cli-linux-aarch64.zip && \
+    chmod +x /usr/local/bin/duckdb
+
+# Install Python packages
+RUN pip install --no-cache-dir \
+    dbt-duckdb==1.7.3 \
+    duckdb==0.10.0 \
+    pandas==2.2.0
+
+# Copy project files
+COPY dbt_project /app/dbt_project
+COPY data /app/data
+
+WORKDIR /app/dbt_project
+
+CMD ["bash"]

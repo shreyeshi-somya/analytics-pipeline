@@ -1,0 +1,11 @@
+ecomm:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: /app/duckdb/analytics.duckdb
+      threads: 4
+      extensions:
+        - parquet
+      settings:
+        TimeZone: 'UTC'  
