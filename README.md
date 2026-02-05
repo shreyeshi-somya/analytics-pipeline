@@ -111,15 +111,9 @@ The project uses the Brazilian E-commerce dataset from Olist, containing:
 
 ---
 
-## About
+## 👤 Author
 
-**Author:** [Your Name]  
-**Education:** MS Business Analytics (UCLA), BS Computer Science (VIT Vellore)  
-**Experience:** Enterprise Analytics at Peloton  
-**Skills:** dbt, Airflow, SQL, Python, Tableau
+- LinkedIn: [Shreyeshi Somya](https://www.linkedin.com/in/sshreyeshi/)
+- Email: sshreyeshi@gmail.com
 
 ---
-
-## License
-
-This project is open source and available under the MIT License.
