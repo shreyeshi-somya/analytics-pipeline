@@ -1,3 +1,5 @@
+> 🚧 **Work in Progress** — This project is actively being developed. 
+
 # End-to-End Analytics Pipeline
 
 A comprehensive data analytics project showcasing modern data engineering and analytics practices across multiple phases.

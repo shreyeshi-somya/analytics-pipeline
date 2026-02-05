@@ -1,0 +1,222 @@
+version: 2
+
+models:
+  - name: stg_orders
+    description: Cleaned and typed order header information with timezone conversions
+    columns:
+      - name: order_id
+        description: Unique identifier for each order
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Foreign key to customer
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: order_status
+        description: Current status of the order
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['delivered', 'shipped', 'canceled', 'unavailable', 'invoiced', 'processing', 'created', 'approved']
+              config:
+                severity: warn
+      - name: order_purchase_timestamp
+        description: Timestamp when order was placed (treated as Sao Paulo time)
+        tests:
+          - not_null
+      - name: order_purchase_timestamp_et
+        description: Order timestamp converted to Eastern Time
+      - name: order_approved_at
+        description: Timestamp when payment was approved
+      - name: order_approved_at_et
+        description: Timestamp when payment was approved converted to Eastern Time
+      - name: order_delivered_carrier_date
+        description: Date order was handed to carrier
+      - name: order_delivered_carrier_date_et
+        description: Date order was handed to carrier converted to Eastern Time
+      - name: order_delivered_customer_date
+        description: Date order was delivered to customer
+      - name: order_delivered_customer_date_et
+        description: Date order was delivered to customer converted to Eastern Time
+      - name: order_estimated_delivery_date
+        description: Estimated delivery date shown to customer
+      - name: order_estimated_delivery_date_et
+        description: Estimated delivery date shown to customer converted to Eastern Time
+        
+  - name: stg_customers
+    description: Customer demographic and location information
+    columns:
+      - name: customer_id
+        description: Unique identifier for each customer-order
+        tests:
+          - unique
+          - not_null
+      - name: customer_unique_id
+        description: Unique customer identifier across all orders
+        tests:
+          - not_null
+      - name: customer_zip_code_prefix
+        description: First 5 digits of customer zip code
+      - name: customer_city
+        description: Customer city name
+      - name: customer_state
+        description: Customer state abbreviation
+        
+  - name: stg_order_items
+    description: Individual line items within each order
+    columns:
+      - name: order_id
+        description: Foreign key to orders
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: order_item_id
+        description: Sequential number identifying item within order
+        tests:
+          - not_null
+      - name: product_id
+        description: Foreign key to products
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+      - name: seller_id
+        description: Foreign key to sellers
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_sellers')
+              field: seller_id
+      - name: shipping_limit_date
+        description: Seller shipping limit date
+      - name: shipping_limit_date_et
+        description: Seller shipping limit date converted to Eastern Point
+      - name: price
+        description: Item price
+        tests:
+          - not_null
+      - name: freight_value
+        description: Freight cost for this item
+        
+  - name: stg_products
+    description: Product catalog with category information
+    columns:
+      - name: product_id
+        description: Unique identifier for each product
+        tests:
+          - unique
+          - not_null
+      - name: product_category_name
+        description: Product category in Portuguese
+      - name: product_name_length
+        description: Length of product name
+      - name: product_description_length
+        description: Length of product description
+      - name: product_photos_qty
+        description: Number of product photos
+      - name: product_weight_g
+        description: Product weight in grams
+      - name: product_length_cm
+        description: Product length in cm
+      - name: product_height_cm
+        description: Product height in cm
+      - name: product_width_cm
+        description: Product width in cm
+        
+  - name: stg_sellers
+    description: Seller information and location
+    columns:
+      - name: seller_id
+        description: Unique identifier for each seller
+        tests:
+          - unique
+          - not_null
+      - name: seller_zip_code_prefix
+        description: First 5 digits of seller zip code
+      - name: seller_city
+        description: Seller city name
+      - name: seller_state
+        description: Seller state abbreviation
+        
+  - name: stg_order_payments
+    description: Payment information for orders
+    columns:
+      - name: order_id
+        description: Foreign key to orders
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: payment_sequential
+        description: Sequential number of payment for this order
+        tests:
+          - not_null
+      - name: payment_type
+        description: Payment method
+        tests:
+          - not_null
+      - name: payment_installments
+        description: Number of installments
+        tests:
+          - not_null
+      - name: payment_value
+        description: Payment amount
+        tests:
+          - not_null
+          
+  - name: stg_order_reviews
+    description: Customer reviews and ratings
+    columns:
+      - name: review_id
+        description: Unique identifier for each review
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        description: Foreign key to orders
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_orders')
+              field: order_id
+      - name: review_score
+        description: Rating from 1-5
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5]
+              config:
+                severity: warn
+      - name: review_comment_title
+        description: Review title written by customer
+      - name: review_comment_message
+        description: Review message written by customer
+      - name: is_comment_present
+        description: Is a review comment present title or message  
+      - name: review_creation_date
+        description: Date review was created
+      - name: review_creation_date_et
+        description: Date review was created converted to Eastern  
+      - name: review_answer_timestamp
+        description: Timestamp when review was answered
+      - name: review_answer_timestamp_et
+        description: Timestamp when review was answered converted to Eastern
+        
+  - name: stg_product_category_name
+    description: Translation of product categories from Portuguese to English
+    columns:
+      - name: product_category_name
+        description: Category name in Portuguese
+        tests:
+          - unique
+          - not_null
+      - name: product_category_name_english
+        description: Category name in English
