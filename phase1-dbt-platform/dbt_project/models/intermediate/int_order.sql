@@ -36,6 +36,14 @@ select
         else 'very_slow'
     end as delivery_speed_category
 
+    -- Customer Details
+    , customers.customer_unique_id
+    , customers.customer_zip_code_prefix
+    , customers.customer_city
+    , customers.customer_state
+    , customers.customer_geolocation_latitude
+    , customers.customer_geolocation_longitude
+
     -- Review Details
     , reviews.review_id
     , reviews.review_score
@@ -52,7 +60,6 @@ select
         when reviews.review_score <= 2 then 'negative'
         else null
     end as review_sentiment
-
     -- Customer left review flag
     , reviews.review_id is not null as has_review
     , date_diff('day', order_delivered_customer_date_et, reviews.review_creation_date_et) as days_to_review
@@ -86,3 +93,4 @@ select
 from {{ ref('stg_orders') }} orders   
 left join {{ ref('int_order_reviews') }} reviews on orders.order_id = reviews.order_id
 left join {{ ref('int_order_payments') }} payments on orders.order_id = payments.order_id
+left join {{ ref('int_customers') }} customers on orders.customer_id = customers.customer_id

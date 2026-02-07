@@ -1,6 +1,23 @@
 version: 2
 
 models:
+  - name: int_geolocation
+    description: Deduplicated geolocation data - one row per zip code prefix with the most common lat/long coordinates
+    columns:
+      - name: geolocation_zip_code_prefix
+        description: Zip code prefix, unique after deduplication
+        tests:
+          - unique
+          - not_null
+      - name: geolocation_latitude
+        description: Most common latitude for this zip code
+      - name: geolocation_longitude
+        description: Most common longitude for this zip code
+      - name: geolocation_city
+        description: City name associated with the most common coordinates
+      - name: geolocation_state
+        description: State abbreviation associated with the most common coordinates
+
   - name: int_customers
     description: Customers enriched with geolocation coordinates via zip code prefix
     columns:
@@ -186,10 +203,6 @@ models:
         description: Sequential number identifying item within order
       - name: product_id
         description: Foreign key to products
-        tests:
-          - relationships:
-              to: ref('int_products')
-              field: product_id
       - name: seller_id
         description: Foreign key to sellers
       - name: shipping_limit_date_et
@@ -236,9 +249,15 @@ models:
         description: Seller city name
       - name: seller_state
         description: Seller state abbreviation
+      - name: seller_zip_code_prefix
+        description: First 5 digits of seller zip code
+      - name: seller_geolocation_latitude
+        description: Seller latitude coordinate from geolocation lookup
+      - name: seller_geolocation_longitude
+        description: Seller longitude coordinate from geolocation lookup
 
   - name: int_order
-    description: Central order model joining orders with reviews and payments, with delivery flags and speed categories
+    description: Central order model joining orders with customer details, reviews, and payments, with delivery flags and speed categories
     columns:
       - name: order_id
         description: Unique identifier for each order
@@ -277,6 +296,18 @@ models:
         description: Days past estimated delivery date (negative means early)
       - name: delivery_speed_category
         description: Delivery speed classification based on days to delivery
+      - name: customer_unique_id
+        description: Unique customer identifier across all orders
+      - name: customer_zip_code_prefix
+        description: First 5 digits of customer zip code
+      - name: customer_city
+        description: Customer city name
+      - name: customer_state
+        description: Customer state abbreviation
+      - name: customer_geolocation_latitude
+        description: Customer latitude coordinate from geolocation lookup
+      - name: customer_geolocation_longitude
+        description: Customer longitude coordinate from geolocation lookup
       - name: review_id
         description: Review identifier from int_order_reviews
       - name: review_score

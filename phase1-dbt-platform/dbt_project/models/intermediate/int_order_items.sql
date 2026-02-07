@@ -70,7 +70,10 @@ select
     -- Seller info
     , seller.seller_city
     , seller.seller_state
+    , seller.seller_zip_code_prefix
+    , seller.seller_geolocation_latitude
+    , seller.seller_geolocation_longitude
 
 from {{ ref('stg_order_items') }} order_items
 left join {{ ref('int_products') }} product on order_items.product_id = product.product_id
-left join {{ ref('stg_sellers') }} seller on order_items.seller_id = seller.seller_id
+left join {{ ref('int_sellers') }} seller on order_items.seller_id = seller.seller_id

@@ -1,42 +1,66 @@
 # Intermediate Layer
 
-The intermediate layer applies business logic, enrichments, and aggregations on top of staging models. These models join related entities, compute derived metrics, and deduplicate data to prepare it for the marts layer.
+The intermediate layer applies business logic, enrichments, and aggregations on top of staging models. These models join related entities, compute derived metrics, deduplicate data, and prepare reusable building blocks for the marts layer.
 
 ## Purpose
 
-- **Joins across staging models** - Combine related entities (e.g., products with category translations, customers with geolocation)
-- **Business logic & derived metrics** - Delivery speed categories, payment breakdowns, shipping cost analysis
+- **Data deduplication** - Deduplicate raw geolocation and review data to ensure clean 1:1 grains
+- **Joins across staging models** - Combine related entities (e.g., products with category translations, customers/sellers with geolocation)
+- **Business logic & derived metrics** - Delivery speed categories, payment breakdowns, shipping cost analysis, review sentiment
 - **Aggregations** - Roll up payment transactions to the order level
-- **Data deduplication** - Handle multi-review orders by selecting the most relevant review
 - **Reusable building blocks** - Provide enriched entities that marts can reference without duplicating logic
 
 ## Models
+
+### Data Deduplication
+
+| Model | Grain | Description |
+|-------|-------|-------------|
+| `int_geolocation` | One row per zip code prefix | Deduplicated geolocation - selects most common lat/long per zip code |
 
 ### Entity Enrichment
 
 | Model | Grain | Description |
 |-------|-------|-------------|
-| `int_customers` | One row per customer | Customers enriched with geolocation coordinates via zip code |
+| `int_customers` | One row per customer | Customers enriched with geolocation coordinates via `int_geolocation` |
 | `int_products` | One row per product | Products joined with English category name translations |
-| `int_sellers` | One row per seller | Sellers enriched with geolocation coordinates via zip code |
+| `int_sellers` | One row per seller | Sellers enriched with geolocation coordinates via `int_geolocation` |
 
 ### Order Domain
 
 | Model | Grain | Description |
 |-------|-------|-------------|
-| `int_order` | One row per order | Central order model joining orders with reviews and payments; adds delivery flags, speed categories, and review sentiment |
-| `int_order_items` | One row per order line item | Order items enriched with product dimensions, shipping weight calculations, and seller location |
+| `int_order` | One row per order | Central order model joining orders with customer details, reviews, and payments; adds delivery flags, speed categories, and review sentiment |
+| `int_order_items` | One row per order line item | Order items enriched with product dimensions, shipping weight calculations, and seller location with coordinates |
 | `int_order_reviews` | One row per order | Deduplicated reviews - consolidates multiple reviews per order into a single record |
 | `int_order_payments__by_type` | One row per order + payment type | Payment transactions aggregated by payment type within each order |
 | `int_order_payments` | One row per order | Order-level payment summary with breakdowns by payment method |
 
 ## Model Details
 
+### int_geolocation
+
+Deduplicates raw geolocation data which has multiple entries per zip code due to varying coordinate precision. Selects the most common lat/long pair for each zip code prefix using a count + rank approach.
+
+**Sources:** `stg_geolocation`
+
+**Deduplication logic:**
+1. Groups by zip code prefix + lat/long/city/state, counting occurrences
+2. Ranks by `row_count DESC` within each zip code prefix
+3. Keeps only the top-ranked (most common) coordinate pair
+
+**Key columns:**
+- `geolocation_zip_code_prefix` - Unique zip code prefix (primary key after dedup)
+- `geolocation_latitude`, `geolocation_longitude` - Most common coordinates
+- `geolocation_city`, `geolocation_state` - City/state for the selected coordinates
+
+---
+
 ### int_customers
 
-Enriches customer records with geographic coordinates by joining to geolocation data on zip code prefix.
+Enriches customer records with geographic coordinates by joining to deduplicated geolocation data on zip code prefix.
 
-**Sources:** `stg_customers`, `stg_geolocation`
+**Sources:** `stg_customers`, `int_geolocation`
 
 **Key columns added:**
 - `customer_geolocation_latitude`, `customer_geolocation_longitude` - Coordinates from geolocation lookup
@@ -57,9 +81,9 @@ Joins the product catalog with the category name translation table to provide En
 
 ### int_sellers
 
-Enriches seller records with geographic coordinates by joining to geolocation data on zip code prefix.
+Enriches seller records with geographic coordinates by joining to deduplicated geolocation data on zip code prefix.
 
-**Sources:** `stg_sellers`, `stg_geolocation`
+**Sources:** `stg_sellers`, `int_geolocation`
 
 **Key columns added:**
 - `seller_geolocation_latitude`, `seller_geolocation_longitude` - Coordinates from geolocation lookup
@@ -124,9 +148,9 @@ Rolls up `int_order_payments__by_type` to a single row per order, providing a co
 
 ### int_order_items
 
-Enriches order line items with product attributes, shipping logistics calculations, and seller location.
+Enriches order line items with product attributes, shipping logistics calculations, and seller location with coordinates.
 
-**Sources:** `stg_order_items`, `int_products`, `stg_sellers`
+**Sources:** `stg_order_items`, `int_products`, `int_sellers`
 
 **Key columns added:**
 
@@ -148,15 +172,16 @@ Enriches order line items with product attributes, shipping logistics calculatio
 - `has_photos`, `has_detailed_description` - Product listing quality flags
 
 *Seller:*
-- `seller_city`, `seller_state` - Seller location
+- `seller_city`, `seller_state`, `seller_zip_code_prefix` - Seller location
+- `seller_geolocation_latitude`, `seller_geolocation_longitude` - Seller coordinates (via `int_sellers`)
 
 ---
 
 ### int_order
 
-The central order-level model that brings together orders, reviews, and payments into a single wide table.
+The central order-level model that brings together orders, customer details, reviews, and payments into a single wide table.
 
-**Sources:** `stg_orders`, `int_order_reviews`, `int_order_payments`
+**Sources:** `stg_orders`, `int_customers`, `int_order_reviews`, `int_order_payments`
 
 **Key columns added:**
 
@@ -172,7 +197,11 @@ The central order-level model that brings together orders, reviews, and payments
 - `days_to_delivery` - Total days from purchase to delivery
 - `days_late` - Days past estimated delivery date
 - `delivery_speed_category` - express / fast / standard / slow / very_slow
-- `fulfillment_speed_category` - same_day / next_day / standard / slow
+
+*Customer Fields:*
+- `customer_unique_id` - Unique customer identifier across all orders
+- `customer_zip_code_prefix`, `customer_city`, `customer_state` - Customer location
+- `customer_geolocation_latitude`, `customer_geolocation_longitude` - Customer coordinates (via `int_customers`)
 
 *Review Fields:*
 - All fields from `int_order_reviews`
@@ -183,26 +212,26 @@ The central order-level model that brings together orders, reviews, and payments
 
 *Payment Fields:*
 - All fields from `int_order_payments`
-- `has_payment_details_missing` - Payment was approved but no payment detail records exist
+- `is_payment_details_missing` - Payment was approved but no payment detail records exist
 
 ## DAG (Dependency Graph)
 
 ```
-stg_customers ──────────┐
-stg_geolocation ────────┤
-                        ├──▶ int_customers
-                        │
-stg_sellers ────────────┤
-stg_geolocation ────────┤
-                        ├──▶ int_sellers
-                        │
-stg_products ───────────┤
-stg_product_category ───┤
-                        ├──▶ int_products ──────────┐
-                        │                           │
-stg_order_items ────────┤                           │
-stg_sellers ────────────┤                           │
-                        ├──▶ int_order_items ◀──────┘
+stg_geolocation ────────┐
+                        ├──▶ int_geolocation ──────┐
+                        │                          │
+stg_customers ──────────┤                          │
+                        ├──▶ int_customers ◀───────┤
+                        │                          │
+stg_sellers ────────────┤                          │
+                        ├──▶ int_sellers ◀─────────┘
+                        │         │
+stg_products ───────────┤         │
+stg_product_category ───┤         │
+                        ├──▶ int_products ─────┐
+                        │                      │
+stg_order_items ────────┤                      │
+                        ├──▶ int_order_items ◀─┘
                         │
 stg_order_reviews ──────┤
                         ├──▶ int_order_reviews ─────┐
@@ -215,6 +244,7 @@ stg_order_payments ─────┤                           │
                         int_order_payments ─────────┤
                                                     │
 stg_orders ─────────────────────────────────────────┤
+int_customers ──────────────────────────────────────┤
                                                     │
                                                     ▼
                                               int_order
@@ -256,7 +286,7 @@ Intermediate models are consumed by:
 
 1. Create SQL file: `models/intermediate/int_<entity>.sql`
 2. Include the config block with `materialized='table'` and `schema='intermediate'`
-3. Add model documentation and tests in a YAML file
+3. Add model documentation and tests in `intermediate.yml`
 4. Run `dbt run -s int_<entity>` and `dbt test -s int_<entity>`
 
 ### Updating Existing Models

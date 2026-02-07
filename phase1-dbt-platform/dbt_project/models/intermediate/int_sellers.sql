@@ -5,7 +5,6 @@
     )
 }}
 
-
 select
     sellers.seller_id
     , sellers.seller_zip_code_prefix
@@ -17,4 +16,4 @@ select
     , geolocation.geolocation_state as seller_geolocation_state
 
 from {{ ref('stg_sellers') }} sellers
-left join {{ ref('stg_geolocation') }} geolocation on sellers.seller_zip_code_prefix = geolocation.geolocation_zip_code_prefix
+left join {{ ref('int_geolocation') }} geolocation on sellers.seller_zip_code_prefix = geolocation.geolocation_zip_code_prefix
