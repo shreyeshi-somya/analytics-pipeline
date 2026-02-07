@@ -1,0 +1,473 @@
+version: 2
+
+models:
+  # ===========================================================================
+  # Dimensions
+  # ===========================================================================
+  - name: dim_customers
+    description: Customer dimension with aggregated order, payment, and review metrics grouped by customer_unique_id
+    columns:
+      - name: customer_unique_id
+        description: Unique customer identifier across all orders
+        tests:
+          - unique
+          - not_null
+      - name: customer_city
+        description: Most recent customer city (from latest order)
+      - name: customer_state
+        description: Most recent customer state (from latest order)
+      - name: customer_zip_code_prefix
+        description: Most recent customer zip code prefix (from latest order)
+      - name: customer_geolocation_latitude
+        description: Most recent customer latitude (from latest order)
+      - name: customer_geolocation_longitude
+        description: Most recent customer longitude (from latest order)
+      - name: total_orders_all_statuses
+        description: Total number of orders across all statuses
+        tests:
+          - not_null
+      - name: total_delivered_orders
+        description: Total number of delivered orders
+      - name: in_progress_orders
+        description: Number of orders currently in progress
+      - name: canceled_orders
+        description: Number of canceled orders
+      - name: cancellation_rate
+        description: Ratio of canceled orders to total orders
+      - name: has_repeat_orders
+        description: Whether customer has more than one delivered order
+      - name: lifetime_value
+        description: Total payment value from delivered orders
+      - name: last_order_date
+        description: Timestamp of most recent delivered order
+      - name: first_order_date
+        description: Timestamp of earliest delivered order
+      - name: customer_lifetime_days
+        description: Days between first and last delivered order
+      - name: avg_days_between_orders
+        description: Average days between delivered orders
+      - name: pct_orders_paid_with_voucher
+        description: Percentage of orders that used voucher payment
+      - name: pct_orders_paid_with_credit_card
+        description: Percentage of orders that used credit card payment
+      - name: dominant_payment_type
+        description: Most frequently used payment type
+      - name: avg_review_score
+        description: Average review score across reviewed orders
+      - name: reviewed_orders
+        description: Number of orders with reviews
+      - name: review_rate
+        description: Ratio of reviewed orders to delivered orders
+
+  - name: dim_sellers
+    description: Seller dimension with location, sales, delivery, and review metrics
+    columns:
+      - name: seller_id
+        description: Unique identifier for each seller
+        tests:
+          - unique
+          - not_null
+      - name: seller_city
+        description: Seller city name
+      - name: seller_state
+        description: Seller state abbreviation
+      - name: seller_zip_code_prefix
+        description: First 5 digits of seller zip code
+      - name: seller_geolocation_latitude
+        description: Seller latitude coordinate
+      - name: seller_geolocation_longitude
+        description: Seller longitude coordinate
+      - name: total_orders_all_statuses
+        description: Total number of distinct orders across all statuses
+        tests:
+          - not_null
+      - name: total_delivered_orders
+        description: Total number of delivered orders
+      - name: has_repeat_orders
+        description: Whether seller has more than one delivered order
+      - name: in_progress_orders
+        description: Number of orders currently in progress
+      - name: canceled_orders
+        description: Number of canceled orders
+      - name: cancellation_rate
+        description: Ratio of canceled orders to total orders
+      - name: total_items_sold
+        description: Total number of delivered line items
+      - name: unique_products_sold
+        description: Number of distinct products sold
+      - name: unique_categories_sold
+        description: Number of distinct product categories sold
+      - name: avg_item_price
+        description: Average price of delivered items
+      - name: avg_freight_per_item
+        description: Average freight cost per delivered item
+      - name: total_product_revenue
+        description: Total revenue from delivered product prices
+      - name: total_freight_collected
+        description: Total freight collected from delivered orders
+      - name: total_order_value
+        description: Total value of delivered orders (price + freight)
+      - name: lifetime_value
+        description: Total payment value from delivered orders
+      - name: avg_delivery_days
+        description: Average days to deliver for delivered orders
+      - name: on_time_delivery_rate
+        description: Rate of on-time deliveries
+      - name: avg_review_score
+        description: Average review score across reviewed orders
+      - name: reviewed_orders
+        description: Number of orders with reviews
+      - name: positive_review_rate
+        description: Rate of positive reviews (score 4-5)
+      - name: first_sale_date
+        description: Timestamp of first delivered order
+      - name: last_sale_date
+        description: Timestamp of most recent delivered order
+      - name: seller_tenure_days
+        description: Days between first and last delivered order
+
+  - name: dim_products
+    description: Product dimension with physical attributes, sales, and performance metrics
+    columns:
+      - name: product_id
+        description: Unique identifier for each product
+        tests:
+          - unique
+          - not_null
+      - name: product_category_name
+        description: Product category in Portuguese
+      - name: product_category_name_english
+        description: Product category translated to English
+      - name: product_weight_g
+        description: Product weight in grams
+      - name: product_length_cm
+        description: Product length in cm
+      - name: product_height_cm
+        description: Product height in cm
+      - name: product_width_cm
+        description: Product width in cm
+      - name: product_volume_cm3
+        description: Product volume in cubic centimeters (L x W x H)
+      - name: volumetric_weight_kg
+        description: Volumetric weight in kg (volume / 6000)
+      - name: chargeable_weight_kg
+        description: Greater of actual weight vs volumetric weight in kg
+      - name: product_size_category
+        description: Size category based on volume
+      - name: is_heavy_item
+        description: Flag for products weighing more than 5kg
+      - name: has_photos
+        description: Whether the product has at least one photo
+      - name: has_detailed_description
+        description: Whether product description is longer than 100 characters
+      - name: total_orders
+        description: Total number of delivered orders containing this product
+      - name: total_units_sold
+        description: Total delivered line items for this product
+      - name: total_revenue
+        description: Total revenue from delivered product sales
+      - name: total_freight
+        description: Total freight collected for delivered orders
+      - name: total_value
+        description: Total value of delivered orders (price + freight)
+      - name: avg_price
+        description: Average price per delivered item
+      - name: avg_freight
+        description: Average freight per delivered item
+      - name: avg_review_score
+        description: Average review score across reviewed orders
+      - name: reviewed_orders
+        description: Number of orders with reviews
+      - name: positive_review_rate
+        description: Rate of positive reviews (score 4-5)
+      - name: avg_delivery_days
+        description: Average days to deliver for delivered orders
+      - name: unique_sellers
+        description: Number of distinct sellers for this product
+      - name: first_sale_date
+        description: Timestamp of first delivered order
+      - name: last_sale_date
+        description: Timestamp of most recent delivered order
+
+  # ===========================================================================
+  # Facts
+  # ===========================================================================
+  - name: fact_order
+    description: Order-level fact table with delivery metrics, review details, payment breakdowns, and holiday flags
+    columns:
+      - name: order_id
+        description: Unique identifier for each order
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Foreign key to customer (order-level)
+        tests:
+          - not_null
+      - name: order_status
+        description: Current status of the order
+        tests:
+          - not_null
+      - name: order_purchase_timestamp_et
+        description: Timestamp when order was placed in Eastern Time
+        tests:
+          - not_null
+      - name: order_payment_approved_at_et
+        description: Timestamp when payment was approved in Eastern Time
+      - name: order_sent_to_carrier_date_et
+        description: Date order was handed to carrier in Eastern Time
+      - name: order_delivered_customer_date_et
+        description: Date order was delivered to customer in Eastern Time
+      - name: order_estimated_delivery_date_et
+        description: Estimated delivery date in Eastern Time
+      - name: is_delivered
+        description: Order was delivered (not canceled, has delivery date)
+      - name: is_canceled
+        description: Order status is canceled
+      - name: is_delivered_on_time
+        description: Delivered on or before estimated delivery date
+      - name: is_in_progress
+        description: Order is in an active fulfillment status
+      - name: days_from_purchase_to_sent_to_carrier
+        description: Days between purchase and handoff to carrier
+      - name: days_in_transit
+        description: Days between carrier handoff and customer delivery
+      - name: days_to_delivery
+        description: Total days from purchase to delivery
+      - name: days_late
+        description: Days past estimated delivery date (negative means early)
+      - name: delivery_speed_category
+        description: Delivery speed classification based on days to delivery
+      - name: customer_unique_id
+        description: Unique customer identifier across all orders
+      - name: customer_zip_code_prefix
+        description: First 5 digits of customer zip code
+      - name: customer_city
+        description: Customer city name
+      - name: customer_state
+        description: Customer state abbreviation
+      - name: customer_geolocation_latitude
+        description: Customer latitude coordinate from geolocation lookup
+      - name: customer_geolocation_longitude
+        description: Customer longitude coordinate from geolocation lookup
+      - name: review_id
+        description: Review identifier
+      - name: review_score
+        description: Rating from 1-5
+      - name: review_comment_title
+        description: Concatenated review titles
+      - name: review_comment_message
+        description: Concatenated review messages
+      - name: is_comment_present
+        description: Whether any review had a comment
+      - name: review_creation_date_et
+        description: Date review was created in Eastern Time
+      - name: review_answer_timestamp_et
+        description: Timestamp when review was answered in Eastern Time
+      - name: review_sentiment
+        description: Sentiment based on review score - positive, neutral, or negative
+      - name: has_review
+        description: Whether the order has a review
+      - name: days_to_review
+        description: Days from delivery to review submission
+      - name: is_quick_review
+        description: Review submitted within 3 days of delivery
+      - name: is_payment_details_missing
+        description: Payment was approved but no payment detail records exist
+      - name: total_payment_value
+        description: Total amount paid across all payment methods
+      - name: total_payment_installments
+        description: Total installments across all payment methods
+      - name: avg_installment_value
+        description: Average installment value
+      - name: used_installments
+        description: Whether more than one installment was used
+      - name: is_high_installment_count
+        description: Flag for orders with more than 6 installments
+      - name: payment_type_count
+        description: Number of distinct payment methods used
+      - name: used_multiple_payment_methods
+        description: Whether the order used more than one payment method
+      - name: first_payment_type
+        description: First payment method by sequence
+      - name: primary_payment_type
+        description: Payment method with the highest value
+      - name: primary_payment_category
+        description: Simplified payment grouping - card, boleto, voucher, or other
+      - name: used_voucher
+        description: Whether voucher was used for this order
+      - name: voucher_payment_value
+        description: Total payment value via voucher
+      - name: voucher_payment_installments
+        description: Total installments via voucher
+      - name: avg_voucher_payment_installments
+        description: Average installment value for voucher payments
+      - name: used_debit_card
+        description: Whether debit card was used for this order
+      - name: debit_card_payment_value
+        description: Total payment value via debit card
+      - name: debit_card_payment_installments
+        description: Total installments via debit card
+      - name: avg_debit_card_payment_installments
+        description: Average installment value for debit card payments
+      - name: used_credit_card
+        description: Whether credit card was used for this order
+      - name: credit_card_payment_value
+        description: Total payment value via credit card
+      - name: credit_card_payment_installments
+        description: Total installments via credit card
+      - name: avg_credit_card_payment_installments
+        description: Average installment value for credit card payments
+      - name: used_boleto
+        description: Whether boleto was used for this order
+      - name: boleto_payment_value
+        description: Total payment value via boleto
+      - name: boleto_payment_installments
+        description: Total installments via boleto
+      - name: avg_boleto_payment_installments
+        description: Average installment value for boleto payments
+      - name: holiday_name
+        description: Name of the Brazilian holiday if the order was placed on one
+      - name: is_national_holiday
+        description: Whether the holiday is a national holiday
+      - name: holiday_type
+        description: Type of holiday - public, religious, or cultural
+      - name: is_holiday_order
+        description: Whether the order was placed on a holiday
+
+  - name: fact_order_items
+    description: Order line item fact table with product dimensions, shipping logistics, and seller location
+    columns:
+      - name: order_id
+        description: Foreign key to orders
+        tests:
+          - not_null
+      - name: order_item_id
+        description: Sequential number identifying item within order
+        tests:
+          - not_null
+      - name: product_id
+        description: Foreign key to products
+        tests:
+          - not_null
+      - name: seller_id
+        description: Foreign key to sellers
+        tests:
+          - not_null
+      - name: shipping_limit_date_et
+        description: Seller shipping limit date in Eastern Time
+      - name: price
+        description: Item price
+        tests:
+          - not_null
+      - name: freight_value
+        description: Freight cost for this item
+      - name: total_item_value
+        description: Price plus freight value
+      - name: freight_pct_of_price
+        description: Shipping cost as a percentage of product price
+      - name: customer_unique_id
+        description: Unique customer identifier across all orders
+      - name: order_status
+        description: Current status of the order
+      - name: is_delivered
+        description: Order was delivered (not canceled, has delivery date)
+      - name: is_in_progress
+        description: Order is in an active fulfillment status
+      - name: is_canceled
+        description: Order status is canceled
+      - name: order_purchase_timestamp_et
+        description: Timestamp when order was placed in Eastern Time
+      - name: order_delivered_customer_date_et
+        description: Date order was delivered to customer in Eastern Time
+      - name: is_delivered_on_time
+        description: Delivered on or before estimated delivery date
+      - name: days_to_delivery
+        description: Total days from purchase to delivery
+      - name: delivery_speed_category
+        description: Delivery speed classification based on days to delivery
+      - name: customer_city
+        description: Customer city name
+      - name: customer_state
+        description: Customer state abbreviation
+      - name: review_score
+        description: Rating from 1-5
+      - name: review_sentiment
+        description: Sentiment based on review score
+      - name: has_review
+        description: Whether the order has a review
+      - name: total_payment_value
+        description: Total amount paid across all payment methods
+      - name: total_payment_installments
+        description: Total installments across all payment methods
+      - name: product_name_length
+        description: Length of product name
+      - name: product_description_length
+        description: Length of product description
+      - name: product_category_name
+        description: Product category in Portuguese
+      - name: product_category_name_english
+        description: Product category translated to English
+      - name: product_weight_g
+        description: Product weight in grams
+      - name: product_length_cm
+        description: Product length in cm
+      - name: product_height_cm
+        description: Product height in cm
+      - name: product_width_cm
+        description: Product width in cm
+      - name: product_volume_cm3
+        description: Product volume in cubic centimeters (L x W x H)
+      - name: volumetric_weight_kg
+        description: Volumetric weight in kg (volume / 6000)
+      - name: chargeable_weight_kg
+        description: Greater of actual weight vs volumetric weight in kg
+      - name: freight_per_kg
+        description: Freight cost per chargeable kg
+      - name: product_size_category
+        description: Size category based on volume
+      - name: is_heavy_item
+        description: Flag for products weighing more than 5kg
+      - name: is_high_value_item
+        description: Flag for items priced above $100
+      - name: has_photos
+        description: Whether the product has at least one photo
+      - name: has_detailed_description
+        description: Whether product description is longer than 100 characters
+      - name: seller_city
+        description: Seller city name
+      - name: seller_state
+        description: Seller state abbreviation
+      - name: seller_zip_code_prefix
+        description: First 5 digits of seller zip code
+      - name: seller_geolocation_latitude
+        description: Seller latitude coordinate
+      - name: seller_geolocation_longitude
+        description: Seller longitude coordinate
+
+  # ===========================================================================
+  # Mart (Denormalized for Visualization)
+  # ===========================================================================
+  - name: mart_order_items
+    description: Denormalized order item model for Data Visualization tool - combines fact_order_items with all dimension attributes
+    columns:
+      - name: order_id
+        description: Foreign key to orders
+        tests:
+          - not_null
+      - name: order_item_id
+        description: Sequential number identifying item within order
+        tests:
+          - not_null
+      - name: product_id
+        description: Foreign key to products
+        tests:
+          - not_null
+      - name: seller_id
+        description: Foreign key to sellers
+        tests:
+          - not_null
+      - name: customer_unique_id
+        description: Unique customer identifier across all orders
+        tests:
+          - not_null

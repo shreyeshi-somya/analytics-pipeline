@@ -19,7 +19,28 @@ select
     -- Shipping cost as percentage of product price
     , order_items.freight_value / nullif(order_items.price, 0) as freight_pct_of_price
     
+    -- Order Attributes
+    , orders.customer_unique_id
+    , orders.order_status
+    , orders.is_delivered
+    , orders.is_in_progress
+    , orders.is_canceled
+    , orders.order_purchase_timestamp_et
+    , orders.order_delivered_customer_date_et
+    , orders.is_delivered_on_time
+    , orders.days_to_delivery
+    , orders.delivery_speed_category
+    , orders.customer_city
+    , orders.customer_state
+    , orders.review_score
+    , orders.review_sentiment
+    , orders.has_review
+    , orders.total_payment_value
+    , orders.total_payment_installments
+
     -- Product attributes
+    , product.product_name_length
+    , product.product_description_length
     , product.product_category_name
     , product.product_category_name_english
     , product.product_weight_g
@@ -75,5 +96,6 @@ select
     , seller.seller_geolocation_longitude
 
 from {{ ref('stg_order_items') }} order_items
+left join {{ ref('int_order') }} orders on order_items.order_id = orders.order_id
 left join {{ ref('int_products') }} product on order_items.product_id = product.product_id
 left join {{ ref('int_sellers') }} seller on order_items.seller_id = seller.seller_id

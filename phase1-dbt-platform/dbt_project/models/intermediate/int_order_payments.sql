@@ -31,7 +31,7 @@ select
 	, sum(payment_installments) as total_payment_installments
 	, sum(payment_value)/sum(payment_installments) as avg_installment_value
     , count(distinct payment_type) as payment_type_count
-    , max(case when is_first_payment_type = true then payment_type else null end) as first_payment_type
+    , max(case when is_first_payment_type then payment_type else null end) as first_payment_type
     , max(case when payment_type_ranked_by_value = 1 then payment_type else null end) as primary_payment_type
 	
 	, sum(case when payment_type = 'voucher' then payment_value else 0 end) as voucher_payment_value

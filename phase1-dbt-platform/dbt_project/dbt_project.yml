@@ -28,3 +28,10 @@ tests:
       +severity: warn
     error_excessive_canceled_with_delivery:
       +severity: error    
+
+seeds:
+  ecomm_analytics:
+    brazilian_holidays:
+      +schema: seeds
+      +column_types:
+        holiday_date: date

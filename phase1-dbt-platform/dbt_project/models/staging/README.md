@@ -6,41 +6,40 @@ The staging layer provides cleaned, typed, and lightly transformed data from raw
 
 - **1:1 relationship with source tables** - Each staging model corresponds to one raw table
 - **Type casting and renaming** - Standardize column names and data types
-- **Light transformations** - Timezone conversions, boolean flags, basic calculations
+- **Light transformations** - Timezone conversions, boolean flags, column renaming, coalesce logic
 - **Data quality foundation** - Tests to catch issues early in the pipeline
 
 ## Models
 
-### Core Tables
-
 | Model | Source | Grain | Description |
 |-------|--------|-------|-------------|
-| `stg_orders` | `raw.orders` | One row per order | Order header with delivery timestamps and status |
-| `stg_customers` | `raw.customers` | One row per customer | Customer demographics and location |
-| `stg_order_items` | `raw.order_items` | One row per order line item | Product-level order details |
-| `stg_order_payments` | `raw.order_payments` | One row per payment transaction | Payment methods and values |
+| `stg_orders` | `raw.orders` | One row per order | Order header with status, delivery timestamps, and payment approval logic |
+| `stg_customers` | `raw.customers` | One row per customer-order | Customer demographics and location (customer_id is unique per order, customer_unique_id spans orders) |
+| `stg_order_items` | `raw.order_items` | One row per order line item | Product-level order details with price and freight |
+| `stg_order_payments` | `raw.order_payments` | One row per payment transaction | Payment methods, installments, and values |
 | `stg_order_reviews` | `raw.order_reviews` | One row per review | Customer ratings and comments |
-| `stg_products` | `raw.products` | One row per product | Product catalog with dimensions |
+| `stg_products` | `raw.products` | One row per product | Product catalog with physical dimensions |
 | `stg_sellers` | `raw.sellers` | One row per seller | Seller information and location |
+| `stg_geolocation` | `raw.geolocation` | One row per geolocation entry | Brazilian zip code coordinates (not yet deduplicated) |
 | `stg_product_category_name` | `raw.product_category_name` | One row per category | Portuguese to English category translation |
 
 ## Key Transformations
 
 ### Timezone Handling
 
-All timestamp columns are provided in two versions:
+All timestamp columns are provided in two versions using the custom `convert_to_timezone` macro:
 
-**Original timestamps** (treated as São Paulo time, UTC-3):
+**Original timestamps** (treated as Sao Paulo time, UTC-3):
 - `order_purchase_timestamp`
-- `order_approved_at`
-- `order_delivered_carrier_date`
+- `order_payment_approved_at`
+- `order_sent_to_carrier_date`
 - `order_delivered_customer_date`
 - `order_estimated_delivery_date`
 
-**Eastern Time converted** (for US-based analysis):
+**Eastern Time converted** (suffixed with `_et`):
 - `order_purchase_timestamp_et`
-- `order_approved_at_et`
-- `order_delivered_carrier_date_et`
+- `order_payment_approved_at_et`
+- `order_sent_to_carrier_date_et`
 - `order_delivered_customer_date_et`
 - `order_estimated_delivery_date_et`
 
@@ -50,70 +49,55 @@ All timestamp columns are provided in two versions:
 {{ convert_to_timezone('order_purchase_timestamp', 'America/New_York') }}
 ```
 
+### Column Renaming
+
+- `order_approved_at` renamed to `order_payment_approved_at` for clarity
+- `order_delivered_carrier_date` renamed to `order_sent_to_carrier_date` for clarity
+- `product_name_lenght` corrected to `product_name_length` (typo fix)
+- `product_description_lenght` corrected to `product_description_length` (typo fix)
+
+### Payment Approval Coalesce Logic
+
+In `stg_orders`, missing `order_approved_at` values are backfilled for orders that reached post-approval statuses (approved, invoiced, processing, shipped, delivered) using `order_purchase_timestamp` as a proxy.
+
 ### Boolean Flags
 
-Added boolean flags for easier filtering where appropriate
-
-**stg_order_reviews:**
-- `is_comment_present` - TRUE if review has title or message
+- `stg_order_reviews.is_comment_present` - TRUE if review has a title or message
 
 ## Data Quality
 
 ### Tests Implemented
 
-#### Column-level Tests
+Tests are defined in `staging.yml`:
 
-**Uniqueness & Completeness:**
-- **Uniqueness:** Primary keys tested with `unique` constraint (ERROR severity)
-- **Not Null:** Critical fields validated for completeness (ERROR severity)
-- **Referential Integrity:** Foreign key relationships verified (ERROR severity)
+**Uniqueness & Completeness (ERROR severity):**
+- Primary keys tested with `unique` + `not_null`: `order_id`, `customer_id`, `product_id`, `seller_id`, `product_category_name`
+- Foreign key not_null: `customer_id` on orders, `order_id` on items/payments/reviews, `product_id` and `seller_id` on items
+- Critical field not_null: `order_purchase_timestamp`, `price`, `payment_type`, `payment_value`, `review_score`
 
-**Accepted Values:**
-- **Enumerations:** Checked against expected valid options (WARN severity)
-- **Rationale:** Set to WARN rather than ERROR to allow for:
-  - New status values added in source system
-  - Edge cases or experimental features
-- **Example:** `order_status` accepts: delivered, shipped, canceled, unavailable, invoiced, processing, created, approved
+**Referential Integrity (ERROR severity):**
+- `stg_orders.customer_id` -> `stg_customers.customer_id`
+- `stg_order_items.order_id` -> `stg_orders.order_id`
+- `stg_order_items.product_id` -> `stg_products.product_id`
+- `stg_order_items.seller_id` -> `stg_sellers.seller_id`
+- `stg_order_payments.order_id` -> `stg_orders.order_id`
+- `stg_order_reviews.order_id` -> `stg_orders.order_id`
 
-**Configuration:**
-```yaml
-# In staging.yml
-- name: order_status
-  tests:
-    - accepted_values:
-        values: ['delivered', 'shipped', 'canceled', ...]
-        config:
-          severity: warn  # Alerts but doesn't fail pipeline
-```
+**Accepted Values (WARN severity):**
+- `order_status`: delivered, shipped, canceled, unavailable, invoiced, processing, created, approved
+- `review_score`: 1, 2, 3, 4, 5
 
-#### Custom Business Logic Tests
+**Non-Negative Values:**
+- `price`, `freight_value`, `payment_value`, `payment_installments`
 
-**Canceled Orders Data Quality Check**
+### Custom Business Logic Tests
 
-Two-tiered approach to monitor data quality:
+**Canceled Orders Data Quality Check:**
 
-1. **Warning Test** (`warn_canceled_orders_with_delivery.sql`)
-   - Identifies canceled orders that have `order_delivered_customer_date` populated
-   - Severity: WARN
-   - Purpose: Document edge cases for investigation
-   
-2. **Error Test** (`error_excessive_canceled_with_delivery.sql`)
-   - Alerts if >1% of canceled orders were delivered to customers
-   - Severity: ERROR
-   - Purpose: Catch systematic data quality degradation
+1. **Warning Test** (`warn_canceled_orders_with_delivery.sql`) - Identifies canceled orders with `order_delivered_customer_date` populated
+2. **Error Test** (`error_excessive_canceled_with_delivery.sql`) - Alerts if >1% of canceled orders were delivered
 
-**Findings:**
-- Only **5 orders** (~0.96% of canceled orders) have customer delivery dates
-- These likely represent:
-  - Data entry errors
-  - Edge cases
-
-**Business Rule Rationale:**
-- ✅ **Acceptable:** Order canceled after handed to carrier (still in transit)
-  - Has `order_delivered_carrier_date` but no `order_delivered_customer_date`
-- ❌ **Suspicious:** Order canceled after customer delivery
-  - Has `order_delivered_customer_date` populated
-  - Should investigate or recategorize as "return"
+**Findings:** Only 5 orders (~0.96%) are affected - likely data entry errors.
 
 ### Running Tests
 ```bash
@@ -131,25 +115,15 @@ dbt test --select warn_canceled_orders_with_delivery error_excessive_canceled_wi
 
 ### Test Severity Strategy
 
-We use a tiered approach to test severity:
-
 **ERROR (Pipeline Blocking):**
 - Primary key violations (duplicates, nulls)
 - Foreign key violations (referential integrity)
 - Critical business rule violations (e.g., >1% data quality issues)
-- Data that would cause downstream model failures
 
 **WARN (Non-Blocking Alerts):**
 - Accepted values for enum fields (allows for new values)
 - Known edge cases with low volume (<1% of records)
-- Data quality issues that don't impact core metrics
 - Exploratory validations during development
-
-**Rationale:**
-- Prevents false positives from blocking production
-- Allows source system evolution (new statuses, categories)
-- Documents data quality issues without halting analysis
-- Enables iterative improvement of data quality rules
 
 ## Naming Conventions
 
@@ -160,8 +134,8 @@ We use a tiered approach to test severity:
 
 ### Columns
 - Use `snake_case`
-- Suffix timestamps with timezone: `_utc`, `_et`
-- Boolean fields: `is_` or `has_` or `used_` prefix
+- Suffix timestamps with timezone: `_et`
+- Boolean fields: `is_` or `has_` prefix
 - Foreign keys: Match referenced table + `_id`
 
 ## Macros
@@ -178,7 +152,6 @@ Converts naive timestamps to specified timezone.
 **Example:**
 ```sql
 {{ convert_to_timezone('order_purchase_timestamp') }} as order_purchase_timestamp_et
-{{ convert_to_timezone('order_purchase_timestamp', 'America/Sao_Paulo') }} as order_purchase_timestamp_br
 ```
 
 ## Dependencies
@@ -197,10 +170,7 @@ dbt deps
 - **Count:** 5 orders
 - **Impact:** Minimal (<1% of canceled orders)
 - **Root Cause:** Likely data entry errors or incorrect status classification
-- **Mitigation:** 
-  - Monitored via custom tests
-  - Flagged for manual review
-  - Does not block pipeline (WARN severity)
+- **Mitigation:** Monitored via custom tests, does not block pipeline
 
 ### 2. Review Duplicates (Handled in Intermediate Layer)
 - Some orders have multiple reviews
@@ -223,9 +193,8 @@ sources:
 ## Downstream Usage
 
 Staging models are consumed by:
-- **Intermediate layer** - Business logic and aggregations
-- **Marts layer** - Final dimensional models
-- **Ad-hoc analysis** - Direct querying for exploration
+- **Intermediate layer** - Business logic, enrichments, and aggregations
+- **Marts layer** - Fact tables reference staging directly in some cases
 
 **Recommendation:** Always reference staging models via `{{ ref('stg_model_name') }}` rather than querying raw tables directly.
 
@@ -235,7 +204,7 @@ Staging models are consumed by:
 
 1. Create SQL file: `models/staging/stg_<entity>.sql`
 2. Add source definition in `_sources.yml`
-3. Add model documentation in `staging.yml`
+3. Add model documentation and tests in `staging.yml`
 4. Implement appropriate tests
 5. Run `dbt run -s stg_<entity>` and `dbt test -s stg_<entity>`
 
@@ -247,15 +216,7 @@ Staging models are consumed by:
 4. Run affected models: `dbt run -s stg_<entity>+`
 5. Verify downstream impact: `dbt test -s stg_<entity>+`
 
-## Questions or Issues?
-
-For questions about staging models, data quality issues, or transformation logic, please:
-1. Check this README
-2. Review model SQL and tests
-3. Consult team data documentation
-4. Open an issue in the repository
-
 ---
 
-**Last Updated:** [Current Date]  
-**Maintained By:** [Shreyeshi Somya]
+**Last Updated:** 2025-02-07
+**Maintained By:** Shreyeshi Somya

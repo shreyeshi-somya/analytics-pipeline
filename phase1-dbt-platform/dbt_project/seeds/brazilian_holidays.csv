@@ -1,0 +1,33 @@
+﻿holiday_date,holiday_name,is_national,holiday_type
+9/7/16,Independence Day,TRUE,public
+10/12/16,Our Lady of Aparecida,TRUE,religious
+11/2/16,All Souls' Day,TRUE,religious
+11/15/16,Proclamation of the Republic,TRUE,public
+11/20/16,Black Awareness Day,FALSE,cultural
+12/25/16,Christmas Day,TRUE,religious
+1/1/17,New Year's Day,TRUE,public
+2/27/17,Carnival Monday,TRUE,public
+2/28/17,Carnival Tuesday,TRUE,public
+4/14/17,Good Friday,TRUE,religious
+4/21/17,Tiradentes' Day,TRUE,public
+5/1/17,Labour Day,TRUE,public
+6/15/17,Corpus Christi,TRUE,religious
+9/7/17,Independence Day,TRUE,public
+10/12/17,Our Lady of Aparecida,TRUE,religious
+11/2/17,All Souls' Day,TRUE,religious
+11/15/17,Proclamation of the Republic,TRUE,public
+11/20/17,Black Awareness Day,FALSE,cultural
+12/25/17,Christmas Day,TRUE,religious
+1/1/18,New Year's Day,TRUE,public
+2/12/18,Carnival Monday,TRUE,public
+2/13/18,Carnival Tuesday,TRUE,public
+3/30/18,Good Friday,TRUE,religious
+4/21/18,Tiradentes' Day,TRUE,public
+5/1/18,Labour Day,TRUE,public
+5/31/18,Corpus Christi,TRUE,religious
+9/7/18,Independence Day,TRUE,public
+10/12/18,Our Lady of Aparecida,TRUE,religious
+11/2/18,All Souls' Day,TRUE,religious
+11/15/18,Proclamation of the Republic,TRUE,public
+11/20/18,Black Awareness Day,FALSE,cultural
+12/25/18,Christmas Day,TRUE,religious

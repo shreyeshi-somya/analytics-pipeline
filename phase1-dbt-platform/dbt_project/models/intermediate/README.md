@@ -22,7 +22,7 @@ The intermediate layer applies business logic, enrichments, and aggregations on 
 
 | Model | Grain | Description |
 |-------|-------|-------------|
-| `int_customers` | One row per customer | Customers enriched with geolocation coordinates via `int_geolocation` |
+| `int_customers` | One row per `customer_id` (unique per order) | Customers enriched with geolocation coordinates via `int_geolocation`. Note: `customer_id` is unique per order, not per person - use `customer_unique_id` to identify the same customer across orders |
 | `int_products` | One row per product | Products joined with English category name translations |
 | `int_sellers` | One row per seller | Sellers enriched with geolocation coordinates via `int_geolocation` |
 
@@ -31,7 +31,7 @@ The intermediate layer applies business logic, enrichments, and aggregations on 
 | Model | Grain | Description |
 |-------|-------|-------------|
 | `int_order` | One row per order | Central order model joining orders with customer details, reviews, and payments; adds delivery flags, speed categories, and review sentiment |
-| `int_order_items` | One row per order line item | Order items enriched with product dimensions, shipping weight calculations, and seller location with coordinates |
+| `int_order_items` | One row per order line item | Order items enriched with order attributes, product dimensions, shipping weight calculations, and seller location with coordinates |
 | `int_order_reviews` | One row per order | Deduplicated reviews - consolidates multiple reviews per order into a single record |
 | `int_order_payments__by_type` | One row per order + payment type | Payment transactions aggregated by payment type within each order |
 | `int_order_payments` | One row per order | Order-level payment summary with breakdowns by payment method |
@@ -58,9 +58,13 @@ Deduplicates raw geolocation data which has multiple entries per zip code due to
 
 ### int_customers
 
-Enriches customer records with geographic coordinates by joining to deduplicated geolocation data on zip code prefix.
+Enriches customer records with geographic coordinates by joining to deduplicated geolocation data on zip code prefix. The grain is one row per `customer_id`, which is unique per order - a single person placing multiple orders will have multiple `customer_id` values but share the same `customer_unique_id`.
 
 **Sources:** `stg_customers`, `int_geolocation`
+
+**Key columns:**
+- `customer_id` - Unique identifier per order (not per person)
+- `customer_unique_id` - Identifier that ties the same customer across multiple orders
 
 **Key columns added:**
 - `customer_geolocation_latitude`, `customer_geolocation_longitude` - Coordinates from geolocation lookup
@@ -148,11 +152,19 @@ Rolls up `int_order_payments__by_type` to a single row per order, providing a co
 
 ### int_order_items
 
-Enriches order line items with product attributes, shipping logistics calculations, and seller location with coordinates.
+Enriches order line items with order-level attributes, product details, shipping logistics calculations, and seller location with coordinates.
 
-**Sources:** `stg_order_items`, `int_products`, `int_sellers`
+**Sources:** `stg_order_items`, `int_order`, `int_products`, `int_sellers`
 
 **Key columns added:**
+
+*Order Attributes (from `int_order`):*
+- `customer_unique_id`, `order_status`, `order_purchase_timestamp_et`, `order_delivered_customer_date_et`
+- `is_delivered`, `is_in_progress`, `is_canceled`, `is_delivered_on_time`
+- `days_to_delivery`, `delivery_speed_category`
+- `customer_city`, `customer_state`
+- `review_score`, `review_sentiment`, `has_review`
+- `total_payment_value`, `total_payment_installments`
 
 *Financial:*
 - `total_item_value` - Price + freight for the line item
@@ -166,14 +178,15 @@ Enriches order line items with product attributes, shipping logistics calculatio
 - `product_size_category` - small / medium / large / extra_large (based on volume)
 - `is_heavy_item` - Flag for products >5kg
 
-*Product Attributes:*
-- `product_category_name_english` - English category name (via `int_products`)
+*Product Attributes (from `int_products`):*
+- `product_category_name_english` - English category name
+- `product_name_length`, `product_description_length` - Listing quality metrics
 - `is_high_value_item` - Flag for items >$100
 - `has_photos`, `has_detailed_description` - Product listing quality flags
 
-*Seller:*
+*Seller (from `int_sellers`):*
 - `seller_city`, `seller_state`, `seller_zip_code_prefix` - Seller location
-- `seller_geolocation_latitude`, `seller_geolocation_longitude` - Seller coordinates (via `int_sellers`)
+- `seller_geolocation_latitude`, `seller_geolocation_longitude` - Seller coordinates
 
 ---
 
@@ -198,19 +211,19 @@ The central order-level model that brings together orders, customer details, rev
 - `days_late` - Days past estimated delivery date
 - `delivery_speed_category` - express / fast / standard / slow / very_slow
 
-*Customer Fields:*
+*Customer Fields (from `int_customers`):*
 - `customer_unique_id` - Unique customer identifier across all orders
 - `customer_zip_code_prefix`, `customer_city`, `customer_state` - Customer location
-- `customer_geolocation_latitude`, `customer_geolocation_longitude` - Customer coordinates (via `int_customers`)
+- `customer_geolocation_latitude`, `customer_geolocation_longitude` - Customer coordinates
 
-*Review Fields:*
+*Review Fields (from `int_order_reviews`):*
 - All fields from `int_order_reviews`
 - `review_sentiment` - positive (4-5), neutral (3), negative (1-2)
 - `has_review` - Whether the order has a review
 - `days_to_review` - Days from delivery to review
 - `is_quick_review` - Review submitted within 3 days of delivery
 
-*Payment Fields:*
+*Payment Fields (from `int_order_payments`):*
 - All fields from `int_order_payments`
 - `is_payment_details_missing` - Payment was approved but no payment detail records exist
 
@@ -222,18 +235,15 @@ stg_geolocation ────────┐
                         │                          │
 stg_customers ──────────┤                          │
                         ├──▶ int_customers ◀───────┤
-                        │                          │
-stg_sellers ────────────┤                          │
+                        │         │                │
+stg_sellers ────────────┤         │                │
                         ├──▶ int_sellers ◀─────────┘
                         │         │
 stg_products ───────────┤         │
 stg_product_category ───┤         │
                         ├──▶ int_products ─────┐
                         │                      │
-stg_order_items ────────┤                      │
-                        ├──▶ int_order_items ◀─┘
-                        │
-stg_order_reviews ──────┤
+stg_order_reviews ──────┤                      │
                         ├──▶ int_order_reviews ─────┐
                         │                           │
 stg_order_payments ─────┤                           │
@@ -248,6 +258,13 @@ int_customers ──────────────────────
                                                     │
                                                     ▼
                                               int_order
+                                                    │
+stg_order_items ────────────────────────────────────┤
+int_products ───────────────────────────────────────┤
+int_sellers ────────────────────────────────────────┤
+                                                    │
+                                                    ▼
+                                          int_order_items
 ```
 
 ## Naming Conventions
@@ -275,7 +292,7 @@ All intermediate models are materialized as **tables** in the `intermediate` sch
 ## Downstream Usage
 
 Intermediate models are consumed by:
-- **Marts layer** - Final dimensional and fact models
+- **Marts layer** - Dimension tables, fact tables, and denormalized marts
 - **Ad-hoc analysis** - Direct querying for exploration
 
 **Recommendation:** Reference intermediate models via `{{ ref('int_model_name') }}` in downstream models.
@@ -298,5 +315,5 @@ Intermediate models are consumed by:
 
 ---
 
-**Last Updated:** 2025-02-06
+**Last Updated:** 2025-02-07
 **Maintained By:** Shreyeshi Somya

@@ -63,32 +63,42 @@ select
     -- Customer left review flag
     , reviews.review_id is not null as has_review
     , date_diff('day', order_delivered_customer_date_et, reviews.review_creation_date_et) as days_to_review
-    , date_diff('day', order_delivered_customer_date_et, reviews.review_creation_date_et) <= 3 as is_quick_review
+    , days_to_review <= 3 as is_quick_review
     
     -- Payment Details
     , (orders.order_payment_approved_at is not null and payments.order_id is null) as is_payment_details_missing
     , payments.total_payment_value
     , payments.total_payment_installments
     , payments.avg_installment_value
+    
+    , payments.used_installments
+    , payments.is_high_installment_count
+
     , payments.payment_type_count
+    , payments.used_multiple_payment_methods
     , payments.first_payment_type
     , payments.primary_payment_type
-    , payments.voucher_payment_value
-    , payments.debit_card_payment_value
-    , payments.credit_card_payment_value
-    , payments.boleto_payment_value
-    , payments.voucher_payment_installments
-    , payments.debit_card_payment_installments
-    , payments.credit_card_payment_installments
-    , payments.boleto_payment_installments
-    , payments.avg_voucher_payment_installments
-    , payments.avg_debit_card_payment_installments
-    , payments.avg_credit_card_payment_installments
-    , payments.avg_boleto_payment_installments
-    , payments.used_multiple_payment_methods
-    , payments.used_installments
     , payments.primary_payment_category
-    , payments.is_high_installment_count
+    
+    , payments.used_voucher
+    , payments.voucher_payment_value
+    , payments.voucher_payment_installments
+    , payments.avg_voucher_payment_installments
+    
+    , payments.used_debit_card
+    , payments.debit_card_payment_value
+    , payments.debit_card_payment_installments
+    , payments.avg_debit_card_payment_installments
+    
+    , payments.used_credit_card
+    , payments.credit_card_payment_value
+    , payments.credit_card_payment_installments
+    , payments.avg_credit_card_payment_installments
+    
+    , payments.used_boleto
+    , payments.boleto_payment_value
+    , payments.boleto_payment_installments
+    , payments.avg_boleto_payment_installments 
 
 from {{ ref('stg_orders') }} orders   
 left join {{ ref('int_order_reviews') }} reviews on orders.order_id = reviews.order_id
