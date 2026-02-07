@@ -41,3 +41,4 @@ phase1-dbt-platform/dbt_project/logs/
 .user.yml
 *.user.yml
 .user.yml
+phase1-dbt-platform/dbt_project/dbt_packages/
