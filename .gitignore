@@ -33,3 +33,7 @@ data/processed/
 .env
 *.duckdb.backup
 data/raw/*.csv
+dbt_project/target/
+dbt_project/logs/
+phase1-dbt-platform/dbt_project/target/
+phase1-dbt-platform/dbt_project/logs/
