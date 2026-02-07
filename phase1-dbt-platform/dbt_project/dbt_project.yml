@@ -21,3 +21,10 @@ models:
     staging:
     intermediate:
     mart:
+
+tests:
+  ecomm_analytics:
+    warn_canceled_orders_with_delivery:
+      +severity: warn
+    error_excessive_canceled_with_delivery:
+      +severity: error    

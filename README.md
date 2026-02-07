@@ -1,4 +1,4 @@
-> 🚧 **Work in Progress** — This project is actively being developed. 
+> 🚧 **Work in Progress** — This project is actively being developed.
 
 # End-to-End Analytics Pipeline
 
@@ -10,12 +10,12 @@ This project demonstrates end-to-end analytics capabilities from data ingestion 
 
 ### Phases
 
-- **Phase 1: dbt Analytics Platform** ⬅️ *Current*
-- Phase 2: Data Science & ML
-- Phase 3: Applied AI (LLM Insights)
-- Phase 4: Visualization (Tableau)
-- Phase 5: Visualization (Power BI)
-- Phase 6: Integration & Polish
+- **Phase 1: dbt Analytics Platform (DuckDB)** ⬅️ *Current*
+    - Phase 1.5: Cloud Migration (Snowflake)
+- Phase 2: Visualization & Analytics (Tableau)
+- Phase 3: Data Science & ML
+- Phase 4: Applied AI (LLM Insights)
+- Phase 5: Integration & Polish
 
 ---
 
@@ -26,7 +26,7 @@ Building a production-grade data transformation pipeline using dbt, DuckDB, and 
 ### Tech Stack
 
 - **Transformation:** dbt (Data Build Tool)
-- **Database:** DuckDB
+- **Database:** DuckDB (local development)
 - **Orchestration:** Docker & Docker Compose
 - **Language:** SQL, Python
 - **Data:** Brazilian E-commerce (Olist dataset)
@@ -53,10 +53,10 @@ phase1-dbt-platform/
 
 - ✅ Dockerized development environment
 - ✅ dbt best practices (staging → intermediate → marts)
-- ✅ Custom macros for timezone conversions
-- ✅ Data quality testing
-- ✅ Incremental models for performance
-- ✅ Complete documentation
+- ✅ Custom macros (timezone conversions, data quality)
+- ✅ Comprehensive data quality testing (generic + singular tests)
+- ✅ Multi-layer transformation pipeline
+- ✅ Complete documentation with lineage
 
 ### Getting Started
 
@@ -67,7 +67,7 @@ phase1-dbt-platform/
 **Setup:**
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/analytics-pipeline.git
+git clone https://github.com/shreyeshi-somya/analytics-pipeline.git
 cd analytics-pipeline/phase1-dbt-platform
 
 # Start the environment
@@ -95,27 +95,93 @@ dbt docs generate
 The project uses the Brazilian E-commerce dataset from Olist, containing:
 - 100k+ orders
 - Customer demographics
-- Product catalog
+- Product catalog with dimensions
 - Reviews & ratings
-- Payment information
-- Geolocation data
+- Payment information (multiple payment methods, installments)
+- Seller & geolocation data
 
 ### Current Progress
 
-- [x] Docker environment setup
-- [x] Data ingestion pipeline
-- [x] Source configuration
-- [x] Staging layer (orders, customers, products)
-- [ ] Intermediate transformations
-- [ ] Dimensional models (facts & dimensions)
-- [ ] Data quality tests
-- [ ] Performance optimization
+**Completed:**
+- ✅ Docker environment setup
+- ✅ Data ingestion pipeline
+- ✅ Source configuration (8 source tables)
+- ✅ Staging layer (8 models with type casting, timezone conversion)
+- ✅ Intermediate layer (6+ models with business logic)
+- ✅ Data quality framework (20+ tests: generic, singular, custom)
+- ✅ Custom macros (timezone conversion, data validation)
+- ✅ dbt packages (dbt_utils)
+
+**In Progress:**
+- 🔄 Marts layer (fact and dimension tables)
+- 🔄 Final documentation and lineage review
+- 🔄 Performance optimization
+
+---
+
+## Phase 1.5: Cloud Migration (Snowflake)
+
+**Status:** Planned
+
+Migrating the dbt pipeline from local DuckDB to Snowflake cloud data warehouse.
+
+### Objectives
+- Deploy models to production-grade cloud warehouse
+- Maintain dual environment (local dev + cloud prod)
+- Demonstrate cloud data engineering skills
+- Add Snowflake to resume/portfolio
+
+### Tech Stack
+- **Cloud Warehouse:** Snowflake (AWS)
+- **Deployment:** dbt with multi-target configuration
+
+---
+
+## Phase 2: Visualization & Analytics (Tableau)
+
+**Status:** Planned
+
+Interactive dashboards and visual analytics.
+
+### Planned Deliverables
+- Executive KPI dashboard
+- Delivery performance analytics
+- Customer behavior analysis
+- Product & seller performance metrics
+- Time-series analysis (weekend/peak patterns)
+
+---
+
+## Phase 3: Data Science & ML
+
+**Status:** Planned
+
+Machine learning models for predictive analytics.
+
+### Planned Models
+- Customer churn prediction
+- Delivery time estimation
+- Product recommendation engine
+- Review sentiment analysis
+
+---
+
+## Phase 4: Applied AI (LLM Insights)
+
+**Status:** Planned
+
+LLM-powered features and insights.
+
+### Planned Features
+- Review translation (Portuguese → English)
+- Automated insight generation
+- Natural language query interface
 
 ---
 
 ## 👤 Author
 
-- LinkedIn: [Shreyeshi Somya](https://www.linkedin.com/in/sshreyeshi/)
-- Email: sshreyeshi@gmail.com
-
----
+**[Shreyeshi Somya]**
+- **Current Role:** Enterprise Analytics at Peloton
+- **LinkedIn:** [Shreyeshi Somya](https://www.linkedin.com/in/sshreyeshi/)
+- **Email:** sshreyeshi@gmail.com

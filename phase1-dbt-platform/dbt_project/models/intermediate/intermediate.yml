@@ -1,0 +1,347 @@
+version: 2
+
+models:
+  - name: int_customers
+    description: Customers enriched with geolocation coordinates via zip code prefix
+    columns:
+      - name: customer_id
+        description: Unique identifier for each customer-order
+      - name: customer_unique_id
+        description: Unique customer identifier across all orders
+      - name: customer_zip_code_prefix
+        description: First 5 digits of customer zip code
+      - name: customer_city
+        description: Customer city name
+      - name: customer_state
+        description: Customer state abbreviation
+      - name: customer_geolocation_latitude
+        description: Latitude coordinate from geolocation lookup
+      - name: customer_geolocation_longitude
+        description: Longitude coordinate from geolocation lookup
+      - name: customer_geolocation_city
+        description: City name from geolocation lookup
+      - name: customer_geolocation_state
+        description: State abbreviation from geolocation lookup
+
+  - name: int_products
+    description: Products joined with English category name translations
+    columns:
+      - name: product_id
+        description: Unique identifier for each product
+      - name: product_category_name
+        description: Product category in Portuguese
+      - name: product_name_length
+        description: Length of product name
+      - name: product_description_length
+        description: Length of product description
+      - name: product_photos_qty
+        description: Number of product photos
+      - name: product_weight_g
+        description: Product weight in grams
+      - name: product_length_cm
+        description: Product length in cm
+      - name: product_height_cm
+        description: Product height in cm
+      - name: product_width_cm
+        description: Product width in cm
+      - name: product_category_name_english
+        description: Product category translated to English
+
+  - name: int_sellers
+    description: Sellers enriched with geolocation coordinates via zip code prefix
+    columns:
+      - name: seller_id
+        description: Unique identifier for each seller
+      - name: seller_zip_code_prefix
+        description: First 5 digits of seller zip code
+      - name: seller_city
+        description: Seller city name
+      - name: seller_state
+        description: Seller state abbreviation
+      - name: seller_geolocation_latitude
+        description: Latitude coordinate from geolocation lookup
+      - name: seller_geolocation_longitude
+        description: Longitude coordinate from geolocation lookup
+      - name: seller_geolocation_city
+        description: City name from geolocation lookup
+      - name: seller_geolocation_state
+        description: State abbreviation from geolocation lookup
+
+  - name: int_order_reviews
+    description: Deduplicated order reviews - one review per order with concatenated comments
+    columns:
+      - name: order_id
+        description: Foreign key to orders, one review per order after deduplication
+        tests:
+          - unique
+          - not_null
+      - name: review_id
+        description: Review identifier from the selected representative review
+      - name: review_score
+        description: Rating from 1-5
+      - name: review_comment_title
+        description: Concatenated review titles for the order
+      - name: review_comment_message
+        description: Concatenated review messages for the order
+      - name: is_comment_present
+        description: Whether any review for the order had a title or message
+      - name: review_creation_date_et
+        description: Date review was created in Eastern Time
+      - name: review_answer_timestamp_et
+        description: Timestamp when review was answered in Eastern Time
+
+  - name: int_order_payments__by_type
+    description: Payment transactions aggregated by payment type within each order
+    columns:
+      - name: order_id
+        description: Foreign key to orders
+        tests:
+          - not_null
+      - name: payment_type
+        description: Payment method type
+        tests:
+          - not_null
+      - name: payment_value
+        description: Total payment value for this type on the order
+      - name: payment_installments
+        description: Total installments for this payment type
+      - name: avg_installment_value
+        description: Average installment amount for this payment type
+      - name: transaction_count
+        description: Number of individual transactions for this type
+      - name: is_first_payment_type
+        description: Whether this was the first payment method used on the order
+
+  - name: int_order_payments
+    description: Order-level payment summary with breakdowns by payment method
+    columns:
+      - name: order_id
+        description: Foreign key to orders, one row per order
+        tests:
+          - unique
+          - not_null
+      - name: total_payment_value
+        description: Total amount paid across all payment methods
+        tests:
+          - not_null
+      - name: total_payment_installments
+        description: Total installments across all payment methods
+        tests:
+          - not_null
+      - name: avg_installment_value
+        description: Average installment value across all methods
+      - name: payment_type_count
+        description: Number of distinct payment methods used
+      - name: first_payment_type
+        description: First payment method by sequence
+      - name: primary_payment_type
+        description: Payment method with the highest value
+      - name: voucher_payment_value
+        description: Total payment value via voucher
+      - name: debit_card_payment_value
+        description: Total payment value via debit card
+      - name: credit_card_payment_value
+        description: Total payment value via credit card
+      - name: boleto_payment_value
+        description: Total payment value via boleto
+      - name: voucher_payment_installments
+        description: Total installments via voucher
+      - name: debit_card_payment_installments
+        description: Total installments via debit card
+      - name: credit_card_payment_installments
+        description: Total installments via credit card
+      - name: boleto_payment_installments
+        description: Total installments via boleto
+      - name: avg_voucher_payment_installments
+        description: Average installment value for voucher payments
+      - name: avg_debit_card_payment_installments
+        description: Average installment value for debit card payments
+      - name: avg_credit_card_payment_installments
+        description: Average installment value for credit card payments
+      - name: avg_boleto_payment_installments
+        description: Average installment value for boleto payments
+      - name: used_voucher
+        description: Whether voucher was used for this order
+      - name: used_debit_card
+        description: Whether debit card was used for this order
+      - name: used_credit_card
+        description: Whether credit card was used for this order
+      - name: used_boleto
+        description: Whether boleto was used for this order
+      - name: used_multiple_payment_methods
+        description: Whether the order used more than one payment method
+      - name: used_installments
+        description: Whether more than one installment was used
+      - name: primary_payment_category
+        description: Simplified payment grouping - card, boleto, voucher, or other
+      - name: is_high_installment_count
+        description: Flag for orders with more than 6 installments
+
+  - name: int_order_items
+    description: Order line items enriched with product dimensions, shipping logistics, and seller location
+    columns:
+      - name: order_id
+        description: Foreign key to orders
+      - name: order_item_id
+        description: Sequential number identifying item within order
+      - name: product_id
+        description: Foreign key to products
+        tests:
+          - relationships:
+              to: ref('int_products')
+              field: product_id
+      - name: seller_id
+        description: Foreign key to sellers
+      - name: shipping_limit_date_et
+        description: Seller shipping limit date in Eastern Time
+      - name: price
+        description: Item price
+      - name: freight_value
+        description: Freight cost for this item
+      - name: total_item_value
+        description: Price plus freight value
+      - name: freight_pct_of_price
+        description: Shipping cost as a percentage of product price
+      - name: product_category_name
+        description: Product category in Portuguese
+      - name: product_category_name_english
+        description: Product category translated to English
+      - name: product_weight_g
+        description: Product weight in grams
+      - name: product_length_cm
+        description: Product length in cm
+      - name: product_height_cm
+        description: Product height in cm
+      - name: product_width_cm
+        description: Product width in cm
+      - name: product_volume_cm3
+        description: Product volume in cubic centimeters (L x W x H)
+      - name: volumetric_weight_kg
+        description: Volumetric weight in kg (volume / 6000)
+      - name: chargeable_weight_kg
+        description: Greater of actual weight vs volumetric weight in kg
+      - name: freight_per_kg
+        description: Freight cost per chargeable kg
+      - name: product_size_category
+        description: Size category based on volume
+      - name: is_heavy_item
+        description: Flag for products weighing more than 5kg
+      - name: is_high_value_item
+        description: Flag for items priced above $100
+      - name: has_photos
+        description: Whether the product has at least one photo
+      - name: has_detailed_description
+        description: Whether product description is longer than 100 characters
+      - name: seller_city
+        description: Seller city name
+      - name: seller_state
+        description: Seller state abbreviation
+
+  - name: int_order
+    description: Central order model joining orders with reviews and payments, with delivery flags and speed categories
+    columns:
+      - name: order_id
+        description: Unique identifier for each order
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Foreign key to customer
+      - name: order_status
+        description: Current status of the order
+      - name: order_purchase_timestamp_et
+        description: Timestamp when order was placed in Eastern Time
+      - name: order_payment_approved_at_et
+        description: Timestamp when payment was approved in Eastern Time
+      - name: order_sent_to_carrier_date_et
+        description: Date order was handed to carrier in Eastern Time
+      - name: order_delivered_customer_date_et
+        description: Date order was delivered to customer in Eastern Time
+      - name: order_estimated_delivery_date_et
+        description: Estimated delivery date in Eastern Time
+      - name: is_delivered
+        description: Order was delivered (not canceled, has delivery date)
+      - name: is_canceled
+        description: Order status is canceled
+      - name: is_delivered_on_time
+        description: Delivered on or before estimated delivery date
+      - name: is_in_progress
+        description: Order is in an active fulfillment status
+      - name: days_from_purchase_to_sent_to_carrier
+        description: Days between purchase and handoff to carrier
+      - name: days_in_transit
+        description: Days between carrier handoff and customer delivery
+      - name: days_to_delivery
+        description: Total days from purchase to delivery
+      - name: days_late
+        description: Days past estimated delivery date (negative means early)
+      - name: delivery_speed_category
+        description: Delivery speed classification based on days to delivery
+      - name: review_id
+        description: Review identifier from int_order_reviews
+      - name: review_score
+        description: Rating from 1-5
+      - name: review_comment_title
+        description: Concatenated review titles
+      - name: review_comment_message
+        description: Concatenated review messages
+      - name: is_comment_present
+        description: Whether any review had a comment
+      - name: review_creation_date_et
+        description: Date review was created in Eastern Time
+      - name: review_answer_timestamp_et
+        description: Timestamp when review was answered in Eastern Time
+      - name: review_sentiment
+        description: Sentiment based on review score - positive, neutral, or negative
+      - name: has_review
+        description: Whether the order has a review
+      - name: days_to_review
+        description: Days from delivery to review submission
+      - name: is_quick_review
+        description: Review submitted within 3 days of delivery
+      - name: is_payment_details_missing
+        description: Payment was approved but no payment detail records exist
+      - name: total_payment_value
+        description: Total amount paid across all payment methods
+      - name: total_payment_installments
+        description: Total installments across all payment methods
+      - name: avg_installment_value
+        description: Average installment value
+      - name: payment_type_count
+        description: Number of distinct payment methods used
+      - name: first_payment_type
+        description: First payment method by sequence
+      - name: primary_payment_type
+        description: Payment method with the highest value
+      - name: voucher_payment_value
+        description: Total payment value via voucher
+      - name: debit_card_payment_value
+        description: Total payment value via debit card
+      - name: credit_card_payment_value
+        description: Total payment value via credit card
+      - name: boleto_payment_value
+        description: Total payment value via boleto
+      - name: voucher_payment_installments
+        description: Total installments via voucher
+      - name: debit_card_payment_installments
+        description: Total installments via debit card
+      - name: credit_card_payment_installments
+        description: Total installments via credit card
+      - name: boleto_payment_installments
+        description: Total installments via boleto
+      - name: avg_voucher_payment_installments
+        description: Average installment value for voucher payments
+      - name: avg_debit_card_payment_installments
+        description: Average installment value for debit card payments
+      - name: avg_credit_card_payment_installments
+        description: Average installment value for credit card payments
+      - name: avg_boleto_payment_installments
+        description: Average installment value for boleto payments
+      - name: used_multiple_payment_methods
+        description: Whether the order used more than one payment method
+      - name: used_installments
+        description: Whether more than one installment was used
+      - name: primary_payment_category
+        description: Simplified payment grouping - card, boleto, voucher, or other
+      - name: is_high_installment_count
+        description: Flag for orders with more than 6 installments

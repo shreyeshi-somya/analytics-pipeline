@@ -46,6 +46,7 @@ models:
         description: Estimated delivery date shown to customer
       - name: order_estimated_delivery_date_et
         description: Estimated delivery date shown to customer converted to Eastern Time
+    
         
   - name: stg_customers
     description: Customer demographic and location information
@@ -102,8 +103,11 @@ models:
         description: Item price
         tests:
           - not_null
+          - non_negative_values
       - name: freight_value
         description: Freight cost for this item
+        tests:
+          - non_negative_values
         
   - name: stg_products
     description: Product catalog with category information
@@ -167,10 +171,12 @@ models:
         description: Number of installments
         tests:
           - not_null
+          - non_negative_values
       - name: payment_value
         description: Payment amount
         tests:
           - not_null
+          - non_negative_values
           
   - name: stg_order_reviews
     description: Customer reviews and ratings
@@ -178,7 +184,6 @@ models:
       - name: review_id
         description: Unique identifier for each review
         tests:
-          - unique
           - not_null
       - name: order_id
         description: Foreign key to orders

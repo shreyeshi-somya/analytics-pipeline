@@ -11,7 +11,7 @@ select
     , review_score
     , review_comment_title
     , review_comment_message
-    , (review_comment_title is not null or review_comment_message is not null) as is_comment_present
+    , (case when review_comment_title is not null and review_comment_message is not null then true else false end) as is_comment_present
     , review_creation_date
     , {{ convert_to_timezone('review_creation_date') }} as review_creation_date_et
     , review_answer_timestamp
