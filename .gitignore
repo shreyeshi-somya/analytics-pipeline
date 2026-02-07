@@ -37,3 +37,7 @@ dbt_project/target/
 dbt_project/logs/
 phase1-dbt-platform/dbt_project/target/
 phase1-dbt-platform/dbt_project/logs/
+*.user.yml
+.user.yml
+*.user.yml
+.user.yml
