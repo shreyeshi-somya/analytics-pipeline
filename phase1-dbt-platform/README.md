@@ -420,10 +420,10 @@ This dual-target approach enables:
 
 ## Project Stats
 
-- **Total Models:** 21 (8 staging + 8 intermediate + 5 marts)
+- **Total Models:** 24 (9 staging + 9 intermediate + 4 marts)
 - **Total Tests:** 30+
-- **Custom Macros:** 3 (timezone conversion, schema naming, generic tests)
-- **Custom Tests:** 2 (positive_values, non_negative_values)
+- **Custom Macros:** 2 (timezone conversion, schema naming)
+- **Custom Tests:** 3 (non_negative_values, error_excessive_canceled_with_delivery, warn_canceled_orders_with_delivery)
 - **Seed Files:** 1 (brazilian_holidays)
 - **Deployment Targets:** 2 (DuckDB, Snowflake)
 - **Lines of SQL:** 1,500+
@@ -436,7 +436,7 @@ This dual-target approach enables:
 
 This project has been successfully deployed to Snowflake cloud data warehouse:
 - 1M+ rows migrated across 9 source tables
-- All 21 models deployed and tested
+- All 24 models deployed and tested
 - ~220MB total storage (compressed)
 - Dual-target architecture maintained
 
