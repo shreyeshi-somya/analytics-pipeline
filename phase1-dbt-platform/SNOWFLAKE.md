@@ -121,7 +121,7 @@ environment:
 
 **Authentication Setup:**  
 Generated SSH key pair for secure authentication:
-```
+```bash
 # Generate RSA key pair
 ssh-keygen -t rsa -b 4096 -m PEM -f ~/.ssh/snowflake_key
 
