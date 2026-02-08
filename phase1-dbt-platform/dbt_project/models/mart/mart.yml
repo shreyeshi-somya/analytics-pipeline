@@ -346,6 +346,11 @@ models:
         description: Sequential number identifying item within order
         tests:
           - not_null
+      - name: order_item_key
+        description: Surrogate key generated from order_id and order_item_id to uniquely identify each order line item across the entire dataset
+        tests:
+          - not_null    
+          - unique
       - name: product_id
         description: Foreign key to products
         tests:
@@ -459,6 +464,11 @@ models:
         description: Sequential number identifying item within order
         tests:
           - not_null
+      - name: order_item_key
+        description: Surrogate key generated from order_id and order_item_id to uniquely identify each order line item across the entire dataset
+        tests:
+          - not_null    
+          - unique
       - name: product_id
         description: Foreign key to products
         tests:

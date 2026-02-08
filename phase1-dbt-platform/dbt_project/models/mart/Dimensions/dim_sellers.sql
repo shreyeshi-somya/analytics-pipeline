@@ -23,7 +23,7 @@ select
     , canceled_orders::float/total_orders_all_statuses as cancellation_rate
 
     -- Order - Item Metrics
-    , count(case when is_delivered then order_item_id end) as total_items_sold
+    , count(distinct case when is_delivered then order_item_key end) as total_items_sold
     -- Product metrics
     , count(distinct product_id) as unique_products_sold
     , count(distinct product_category_name_english) as unique_categories_sold

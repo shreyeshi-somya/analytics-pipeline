@@ -8,6 +8,7 @@
 select
     order_id
     , order_item_id
+    , {{ dbt_utils.generate_surrogate_key(['order_id', 'order_item_id']) }} as order_item_key
     , product_id
     , seller_id
     , shipping_limit_date

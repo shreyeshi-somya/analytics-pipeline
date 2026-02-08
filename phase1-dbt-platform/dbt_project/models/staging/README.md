@@ -15,7 +15,7 @@ The staging layer provides cleaned, typed, and lightly transformed data from raw
 |-------|--------|-------|-------------|
 | `stg_orders` | `raw.orders` | One row per order | Order header with status, delivery timestamps, and payment approval logic |
 | `stg_customers` | `raw.customers` | One row per customer-order | Customer demographics and location (customer_id is unique per order, customer_unique_id spans orders) |
-| `stg_order_items` | `raw.order_items` | One row per order line item | Product-level order details with price and freight |
+| `stg_order_items` | `raw.order_items` | One row per order line item | Product-level order details with price, freight, and surrogate key (`order_item_key`) |
 | `stg_order_payments` | `raw.order_payments` | One row per payment transaction | Payment methods, installments, and values |
 | `stg_order_reviews` | `raw.order_reviews` | One row per review | Customer ratings and comments |
 | `stg_products` | `raw.products` | One row per product | Product catalog with physical dimensions |
@@ -59,6 +59,10 @@ All timestamp columns are provided in two versions using the custom `convert_to_
 ### Payment Approval Coalesce Logic
 
 In `stg_orders`, missing `order_approved_at` values are backfilled for orders that reached post-approval statuses (approved, invoiced, processing, shipped, delivered) using `order_purchase_timestamp` as a proxy.
+
+### Surrogate Keys
+
+- `stg_order_items.order_item_key` - Generated via `dbt_utils.generate_surrogate_key(['order_id', 'order_item_id'])` to uniquely identify each order line item across the entire dataset
 
 ### Boolean Flags
 

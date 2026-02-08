@@ -18,6 +18,7 @@ select
     -- ========================================================================
     fact.order_id
     , fact.order_item_id
+    , fact.order_item_key
     , fact.product_id
     , fact.seller_id
     , fact.shipping_limit_date_et

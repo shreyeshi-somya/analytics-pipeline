@@ -25,7 +25,7 @@ select
     
     -- Sales metrics (delivered orders only)
     , count(distinct case when is_delivered then order_id end) as total_orders
-    , count(case when is_delivered then order_item_id end) as total_units_sold
+    , count(distinct case when is_delivered then order_item_key end) as total_units_sold
     
     -- Revenue metrics (delivered orders only)
     , sum(case when is_delivered then price end) as total_revenue

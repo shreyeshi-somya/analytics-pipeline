@@ -9,6 +9,7 @@ select
     
     order_items.order_id
     , order_items.order_item_id
+    , order_items.order_item_key
     , order_items.product_id
     , order_items.seller_id
     , order_items.shipping_limit_date_et
