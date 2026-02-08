@@ -10,8 +10,8 @@ This project demonstrates end-to-end analytics capabilities from data ingestion 
 
 ### Phases
 
-- **Phase 1: dbt Analytics Platform (DuckDB)** ⬅️ *Current*
-    - Phase 1.5: Cloud Migration (Snowflake)
+- **Phase 1: dbt Analytics Platform (DuckDB)** ✅ *Complete*
+- Phase 1.5: Cloud Migration (Snowflake)
 - Phase 2: Visualization & Analytics (Tableau)
 - Phase 3: Data Science & ML
 - Phase 4: Applied AI (LLM Insights)
@@ -19,16 +19,17 @@ This project demonstrates end-to-end analytics capabilities from data ingestion 
 
 ---
 
-## Phase 1: dbt Analytics Platform
+## Phase 1: dbt Analytics Platform ✅
 
-Building a production-grade data transformation pipeline using dbt, DuckDB, and Docker.
+Built a production-grade data transformation pipeline using dbt, DuckDB, and Docker.
 
 ### Tech Stack
 
-- **Transformation:** dbt (Data Build Tool)
-- **Database:** DuckDB (local development)
+- **Transformation:** dbt Core 1.7.3
+- **Database:** DuckDB 0.10.0
 - **Orchestration:** Docker & Docker Compose
-- **Language:** SQL, Python
+- **Languages:** SQL, Python
+- **Testing:** dbt tests (generic, singular, custom)
 - **Data:** Brazilian E-commerce (Olist dataset)
 
 ### Project Structure
@@ -36,11 +37,12 @@ Building a production-grade data transformation pipeline using dbt, DuckDB, and 
 phase1-dbt-platform/
 ├── dbt_project/
 │   ├── models/
-│   │   ├── staging/        # Clean, typed data from sources
-│   │   ├── intermediate/   # Business logic & transformations
-│   │   └── marts/          # Final analytical models
-│   ├── macros/             # Reusable SQL functions
-│   └── tests/              # Data quality tests
+│   │   ├── staging/        # Clean, typed data from sources (8 models)
+│   │   ├── intermediate/   # Business logic & transformations (8 models)
+│   │   └── marts/          # Final analytical models (5 models)
+│   ├── macros/             # Custom reusable SQL functions (2 macros)
+│   ├── tests/              # Data quality tests (30+ tests)
+│   └── seeds/              # Reference data (Brazilian holidays)
 ├── data/
 │   └── raw/               # Source CSV files (not committed)
 ├── scripts/
@@ -49,14 +51,65 @@ phase1-dbt-platform/
 └── docker-compose.yml
 ```
 
-### Features
+### Key Features
 
-- ✅ Dockerized development environment
-- ✅ dbt best practices (staging → intermediate → marts)
-- ✅ Custom macros (timezone conversions, data quality)
-- ✅ Comprehensive data quality testing (generic + singular tests)
-- ✅ Multi-layer transformation pipeline
-- ✅ Complete documentation with lineage
+✅ **Multi-layer Architecture**
+- Staging → Intermediate → Marts
+- 21 total models across 3 layers
+- Dimensional modeling (3 dimensions + 2 facts)
+
+✅ **Data Quality Framework**
+- 30+ tests (generic, singular, custom)
+- Tiered severity (WARN vs ERROR)
+- Custom generic tests (positive_values, non_negative_values)
+
+✅ **Custom Business Logic**
+- Timezone conversion macro (São Paulo → Eastern Time)
+- Review deduplication (intelligent 1-day window logic)
+- Payment aggregation by type
+- Surrogate key generation
+
+✅ **Production Best Practices**
+- Dockerized environment
+- Comprehensive YAML documentation
+- Version-controlled transformations
+- Reusable macros and tests
+
+### Data Model
+
+**Source Data:** Brazilian E-commerce (Olist dataset from Kaggle)
+- 100k+ orders
+- 112k order items
+- 99k customers
+- 32k products
+- 3k sellers
+- 1M geolocation records
+- Time period: Sept 2016 - Dec 2018
+
+**Dimensional Model:**
+- `dim_customers` - Customer lifetime metrics and behavior
+- `dim_products` - Product performance and attributes
+- `dim_sellers` - Seller performance and ratings
+- `fct_orders` - Order-level transactions with delivery tracking
+- `fct_order_items` - Item-level details (wide denormalized table)
+
+### Highlights
+
+**Custom Transformations:**
+- Timezone conversions for all timestamps
+- Intelligent review deduplication logic
+- Payment method aggregation and categorization
+- Missing data imputation (order approval timestamps)
+- Geolocation deduplication by zip code
+
+**Data Quality Insights:**
+- Identified data quality issues (5 canceled orders with delivery dates)
+- Implemented threshold-based monitoring
+- Documented edge cases and business rules
+
+**Reference Data:**
+- Brazilian holidays seed file (26 holidays, 2016-2018)
+- Enables holiday shopping pattern analysis
 
 ### Getting Started
 
@@ -80,42 +133,28 @@ docker compose exec dbt bash
 # Load data
 python /app/scripts/load_data.py
 
-# Run dbt models
-dbt run
-
-# Run tests
-dbt test
-
-# Generate documentation
-dbt docs generate
+# Run dbt pipeline
+dbt seed              # Load Brazilian holidays
+dbt run               # Build all models
+dbt test              # Run all tests
+dbt docs generate     # Generate documentation
 ```
 
-### Data Model
+### Phase 1 Deliverables ✅
 
-The project uses the Brazilian E-commerce dataset from Olist, containing:
-- 100k+ orders
-- Customer demographics
-- Product catalog with dimensions
-- Reviews & ratings
-- Payment information (multiple payment methods, installments)
-- Seller & geolocation data
-
-### Current Progress
-
-**Completed:**
 - ✅ Docker environment setup
-- ✅ Data ingestion pipeline
-- ✅ Source configuration (8 source tables)
+- ✅ Data ingestion pipeline (8 raw tables, 1M+ rows)
 - ✅ Staging layer (8 models with type casting, timezone conversion)
-- ✅ Intermediate layer (6+ models with business logic)
-- ✅ Data quality framework (20+ tests: generic, singular, custom)
-- ✅ Custom macros (timezone conversion, data validation)
-- ✅ dbt packages (dbt_utils)
+- ✅ Intermediate layer (8 models with business logic, joins, deduplication)
+- ✅ Marts layer (5 dimensional models: 3 dims + 2 facts)
+- ✅ Data quality framework (30+ tests)
+- ✅ Custom macros (2: timezone conversion, data validation)
+- ✅ Custom generic tests (2: positive_values, non_negative_values)
+- ✅ Seed data (Brazilian holidays reference table)
+- ✅ Comprehensive documentation (YAML schemas, inline comments)
+- ✅ Project README with architecture and screenshots
 
-**In Progress:**
-- 🔄 Marts layer (fact and dimension tables)
-- 🔄 Final documentation and lineage review
-- 🔄 Performance optimization
+**[View Phase 1 detailed documentation →](phase1-dbt-platform/README.md)**
 
 ---
 
@@ -179,9 +218,33 @@ LLM-powered features and insights.
 
 ---
 
+## Skills Demonstrated
+
+**Analytics Engineering:**
+- dbt (Data Build Tool)
+- Dimensional modeling
+- Data quality testing
+- SQL optimization
+
+**Data Engineering:**
+- Docker containerization
+- Python data pipelines
+- DuckDB database
+- Version control (Git)
+
+**Best Practices:**
+- Modular code architecture
+- Comprehensive documentation
+- Automated testing
+- Reusable components (macros, tests)
+
+---
+
 ## 👤 Author
 
-**[Shreyeshi Somya]**
+**Shreyeshi Somya**
+- **Education:** MS Business Analytics (UCLA) | BS Computer Science (VIT Vellore)
 - **Current Role:** Enterprise Analytics at Peloton
-- **LinkedIn:** [Shreyeshi Somya](https://www.linkedin.com/in/sshreyeshi/)
+- **Skills:** dbt, Snowflake, Airflow, SQL, Python, Tableau
+- **LinkedIn:** [linkedin.com/in/sshreyeshi](https://www.linkedin.com/in/sshreyeshi/)
 - **Email:** sshreyeshi@gmail.com
