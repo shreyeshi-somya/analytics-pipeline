@@ -66,7 +66,8 @@ CREATE DATABASE ECOMM_ANALYTICS;
 CREATE SCHEMA ECOMM_ANALYTICS.RAW;
 CREATE SCHEMA ECOMM_ANALYTICS.STAGING;
 CREATE SCHEMA ECOMM_ANALYTICS.INTERMEDIATE;
-CREATE SCHEMA ECOMM_ANALYTICS.MARTS;
+CREATE SCHEMA ECOMM_ANALYTICS.CORE;
+CREATE SCHEMA ECOMM_ANALYTICS.MART;
 ```
 
 ### 2. Data Loading
@@ -226,7 +227,7 @@ Wide denormalized order line item table with product, seller, and customer conte
 - Raw data: ~49MB
 - Staging: ~53MB
 - Intermediate: ~53MB
-- Marts: ~63MB
+- Core + Mart: ~63MB
 - **Total: ~220MB**
 
 **Note:** Snowflake automatically compresses data (~2.7x compression from 130MB CSV)
@@ -237,7 +238,7 @@ Wide denormalized order line item table with product, seller, and customer conte
 |--------------|--------|-----------|
 | Staging      | 3s     | 10s       |
 | Intermediate | 3s     | 17s       |
-| Marts        | 3s     | 14s       |
+| Core + Mart  | 3s     | 14s       |
 | **Total**    | 9s     | 41s       |
 
 ---
