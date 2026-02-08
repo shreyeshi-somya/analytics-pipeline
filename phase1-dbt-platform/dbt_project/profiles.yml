@@ -14,7 +14,7 @@ ecomm:
       type: snowflake
       account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
       user: "{{ env_var('SNOWFLAKE_USER') }}"
-      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      private_key_path: /root/.ssh/snowflake_key
       role: ACCOUNTADMIN
       database: ECOMM_ANALYTICS
       warehouse: COMPUTE_WH

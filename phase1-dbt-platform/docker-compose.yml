@@ -11,6 +11,7 @@ services:
       - ./data:/app/data
       - ./duckdb:/app/duckdb
       - ./scripts:/app/scripts
+      - ~/.ssh/snowflake_key:/root/.ssh/snowflake_key:ro
     working_dir: /app/dbt_project
     stdin_open: true
     tty: true
@@ -18,4 +19,3 @@ services:
     environment:
       - SNOWFLAKE_ACCOUNT=${SNOWFLAKE_ACCOUNT}
       - SNOWFLAKE_USER=${SNOWFLAKE_USER}
-      - SNOWFLAKE_PASSWORD=${SNOWFLAKE_PASSWORD}

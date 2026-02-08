@@ -45,6 +45,9 @@ select
     , fact.has_review
     , fact.total_payment_value
     , fact.total_payment_installments
+    , fact.revenue_delivered
+    , fact.product_price_delivered
+    , fact.freight_delivered
 
     -- Product Attributes
     , fact.product_name_length

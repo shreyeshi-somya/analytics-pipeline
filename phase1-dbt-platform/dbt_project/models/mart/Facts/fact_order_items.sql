@@ -37,6 +37,10 @@ select
     , total_payment_value
     , total_payment_installments
 
+    , case when is_delivered then total_item_value else 0 end as revenue_delivered
+    , case when is_delivered then price else 0 end as product_price_delivered
+    , case when is_delivered then freight_value else 0 end as freight_delivered
+
     -- Product Attributes
     , product_name_length
     , product_description_length
@@ -62,5 +66,7 @@ select
     , seller_zip_code_prefix
     , seller_geolocation_latitude
     , seller_geolocation_longitude
+
+    
 
 from {{ ref('int_order_items') }}

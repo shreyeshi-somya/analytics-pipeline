@@ -102,7 +102,7 @@ snowflake:
   type: snowflake
   account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
   user: "{{ env_var('SNOWFLAKE_USER') }}"
-  password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+  private_key_path: /root/.ssh/snowflake_key  # Key pair authentication
   role: ACCOUNTADMIN
   database: ECOMM_ANALYTICS
   warehouse: COMPUTE_WH
@@ -112,10 +112,25 @@ snowflake:
 
 **Added to docker-compose.yml:**
 ```yaml
+volumes:
+  - ~/.ssh/snowflake_key:/root/.ssh/snowflake_key:ro
 environment:
   - SNOWFLAKE_ACCOUNT=your_account.us-east-1
   - SNOWFLAKE_USER=your_username
-  - SNOWFLAKE_PASSWORD=your_password
+```
+
+**Authentication Setup:**  
+Generated SSH key pair for secure authentication:
+```
+# Generate RSA key pair
+ssh-keygen -t rsa -b 4096 -m PEM -f ~/.ssh/snowflake_key
+
+# Extract public key for Snowflake
+openssl rsa -in ~/.ssh/snowflake_key -pubout -out ~/.ssh/snowflake_key_pub.pem
+
+# Add public key to Snowflake user
+ALTER USER your_email@example.com 
+SET RSA_PUBLIC_KEY='<public_key_content>';
 ```
 
 ---
