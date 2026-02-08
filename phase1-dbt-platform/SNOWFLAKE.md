@@ -196,7 +196,7 @@ Customer dimension with lifetime metrics, behavioral flags, and geographic attri
 
 Order fact table with comprehensive metrics including delivery performance, payment details, and review sentiment.
 
-### Fact: Order Items
+### Mart: Order Items
 
 ![fct_order_items](docs/images/snowflake/mart_order_item.png)
 
