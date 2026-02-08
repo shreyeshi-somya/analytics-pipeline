@@ -179,19 +179,19 @@ Every model documented with:
 
 ![Staging Build](docs/images/staging_models.png)
 
-8 models built successfully with data quality tests passing.
+9 models built successfully with data quality tests passing.
 
 **Intermediate Layer:**
 
 ![Intermediate Build](docs/images/intermediate_models.png)
 
-8 models with complex business logic and joins executed successfully.
+9 models with complex business logic and joins executed successfully.
 
 **Marts Layer:**
 
 ![Marts Build](docs/images/mart_models.png)
 
-5 dimensional models created and tested, ready for analytics.
+6 dimensional models created and tested, ready for analytics.
 
 ### Snowflake (Cloud Production)
 
