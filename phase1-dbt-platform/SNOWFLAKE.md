@@ -127,8 +127,11 @@ ssh-keygen -t rsa -b 4096 -m PEM -f ~/.ssh/snowflake_key
 
 # Extract public key for Snowflake
 openssl rsa -in ~/.ssh/snowflake_key -pubout -out ~/.ssh/snowflake_key_pub.pem
+```
 
-# Add public key to Snowflake user
+In Snowflake UI -
+```sql
+-- Add public key to Snowflake user
 ALTER USER your_email@example.com 
 SET RSA_PUBLIC_KEY='<public_key_content>';
 ```
