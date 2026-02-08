@@ -11,7 +11,7 @@ This project demonstrates end-to-end analytics capabilities from data ingestion 
 ### Phases
 
 - **Phase 1: dbt Analytics Platform (DuckDB)** ✅ *Complete*
-- **Phase 1.5: Cloud Migration (Snowflake)** ✅ *Complete*
+   - **Phase 1.5: Cloud Migration (Snowflake)** ✅ *Complete*
 - Phase 2: Visualization & Analytics (Tableau)
 - Phase 3: Data Science & ML
 - Phase 4: Applied AI (LLM Insights)
