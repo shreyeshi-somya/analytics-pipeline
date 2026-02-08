@@ -20,7 +20,7 @@ select
     , count(case when is_delivered then order_id else null end) as total_delivered_orders
     , count(case when is_in_progress then order_id else null end) as in_progress_orders
     , count(case when is_canceled then order_id else null end) as canceled_orders
-    , canceled_orders::float/total_orders_all_statuses as cancellation_rate
+    , canceled_orders::float / nullif(total_orders_all_statuses,0) as cancellation_rate
     , count(case when is_delivered then order_id end) > 1 as has_repeat_orders
     
     , sum(case when is_delivered then total_payment_value else 0 end) as lifetime_value
@@ -28,8 +28,8 @@ select
     , min(case when is_delivered then order_purchase_timestamp_et end) as first_order_date
 
     -- Days between Orders
-    , date_diff('day', first_order_date, last_order_date) as customer_lifetime_days
-    , customer_lifetime_days / (total_delivered_orders - 1) as avg_days_between_orders
+    , datediff('day', first_order_date, last_order_date) as customer_lifetime_days
+    , customer_lifetime_days::float / nullif(total_delivered_orders - 1, 0) as avg_days_between_orders
     
      -- Payment behavior
     , count(case when used_voucher then order_id end)::float / nullif(count(order_id), 0) as pct_orders_paid_with_voucher
@@ -39,7 +39,7 @@ select
     -- Review metrics
     , avg(case when has_review then review_score end) as avg_review_score
     , count(case when has_review then order_id end) as reviewed_orders
-    , count(case when has_review then order_id end)::float / total_delivered_orders as review_rate
+    , count(case when has_review then order_id end)::float / nullif(total_delivered_orders,0) as review_rate
 
 from {{ ref('int_order') }}
 {{ dbt_utils.group_by(1) }}

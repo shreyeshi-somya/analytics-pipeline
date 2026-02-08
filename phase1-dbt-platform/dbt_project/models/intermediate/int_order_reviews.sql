@@ -23,7 +23,7 @@ select
     -- Earliest review timestamp for the order
 	, min(review_answer_timestamp_et) over (partition by order_id) as first_review_answer_timestamp_et 
     -- Calculate days between this review and the first review for this order
-    , date_diff('day', first_review_answer_timestamp_et, review_answer_timestamp_et) as days_since_first_review
+    , datediff('day', first_review_answer_timestamp_et, review_answer_timestamp_et) as days_since_first_review
 from {{ ref('stg_order_reviews') }}
 )
 

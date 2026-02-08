@@ -29,7 +29,7 @@ select
 	order_id
     , sum(payment_value) as total_payment_value
 	, sum(payment_installments) as total_payment_installments
-	, sum(payment_value)/sum(payment_installments) as avg_installment_value
+	, sum(payment_value)/nullif(sum(payment_installments),0) as avg_installment_value
     , count(distinct payment_type) as payment_type_count
     , max(case when is_first_payment_type then payment_type else null end) as first_payment_type
     , max(case when payment_type_ranked_by_value = 1 then payment_type else null end) as primary_payment_type
@@ -44,15 +44,15 @@ select
 	, sum(case when payment_type = 'credit_card' then payment_installments else 0 end) as credit_card_payment_installments
 	, sum(case when payment_type = 'boleto' then payment_installments else 0 end) as boleto_payment_installments
 	
-	, coalesce(voucher_payment_value/voucher_payment_installments,0) as avg_voucher_payment_installments
-	, coalesce(debit_card_payment_value/debit_card_payment_installments,0) as avg_debit_card_payment_installments
-	, coalesce(credit_card_payment_value/credit_card_payment_installments,0) as avg_credit_card_payment_installments
-	, coalesce(boleto_payment_value/boleto_payment_installments,0) as avg_boleto_payment_installments
+	, coalesce(voucher_payment_value / nullif(voucher_payment_installments,0),0) as avg_voucher_payment_installments
+	, coalesce(debit_card_payment_value / nullif(debit_card_payment_installments,0),0) as avg_debit_card_payment_installments
+	, coalesce(credit_card_payment_value / nullif(credit_card_payment_installments,0),0) as avg_credit_card_payment_installments
+	, coalesce(boleto_payment_value / nullif(boleto_payment_installments,0),0) as avg_boleto_payment_installments
 
-	, bool_or(used_voucher) as used_voucher
-	, bool_or(used_debit_card) as used_debit_card
-	, bool_or(used_credit_card) as used_credit_card
-	, bool_or(used_boleto) as used_boleto
+	, max(used_voucher) as used_voucher
+	, max(used_debit_card) as used_debit_card
+	, max(used_credit_card) as used_credit_card
+	, max(used_boleto) as used_boleto
 
     -- Used multiple payment methods (split payment)
     , payment_type_count > 1 as used_multiple_payment_methods
@@ -72,4 +72,4 @@ select
     , total_payment_installments > 6 as is_high_installment_count
     
 from order_payments_by_type
-group by 1 
+group by 1

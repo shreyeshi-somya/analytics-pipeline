@@ -22,10 +22,10 @@ select
     , order_status in ('approved', 'invoiced', 'processing', 'shipped') as is_in_progress
     
     -- Order Level Calculations
-    , date_diff('day', orders.order_purchase_timestamp_et, orders.order_sent_to_carrier_date_et) as days_from_purchase_to_sent_to_carrier
-    , date_diff('day', orders.order_sent_to_carrier_date_et, orders.order_delivered_customer_date_et) as days_in_transit
-    , date_diff('day', orders.order_purchase_timestamp_et, orders.order_delivered_customer_date_et) as days_to_delivery
-    , date_diff('day', orders.order_estimated_delivery_date_et, orders.order_delivered_customer_date_et) as days_late
+    , datediff('day', orders.order_purchase_timestamp_et, orders.order_sent_to_carrier_date_et) as days_from_purchase_to_sent_to_carrier
+    , datediff('day', orders.order_sent_to_carrier_date_et, orders.order_delivered_customer_date_et) as days_in_transit
+    , datediff('day', orders.order_purchase_timestamp_et, orders.order_delivered_customer_date_et) as days_to_delivery
+    , datediff('day', orders.order_estimated_delivery_date_et, orders.order_delivered_customer_date_et) as days_late
 
     -- Delivery speed category
     , case 
@@ -62,7 +62,7 @@ select
     end as review_sentiment
     -- Customer left review flag
     , reviews.review_id is not null as has_review
-    , date_diff('day', order_delivered_customer_date_et, reviews.review_creation_date_et) as days_to_review
+    , datediff('day', order_delivered_customer_date_et, reviews.review_creation_date_et) as days_to_review
     , days_to_review <= 3 as is_quick_review
     
     -- Payment Details

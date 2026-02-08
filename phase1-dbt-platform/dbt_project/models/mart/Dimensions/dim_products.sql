@@ -38,7 +38,7 @@ select
     -- Customer satisfaction
     , avg(case when has_review then review_score end) as avg_review_score
     , count(case when has_review then order_id end) as reviewed_orders
-    , count(case when review_sentiment = 'positive' then order_id end)::float / reviewed_orders as positive_review_rate
+    , count(case when review_sentiment = 'positive' then order_id end)::float / nullif(reviewed_orders,0) as positive_review_rate
     
     -- Delivery performance
     , avg(case when is_delivered then days_to_delivery end) as avg_delivery_days

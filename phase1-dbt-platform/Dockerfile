@@ -19,8 +19,10 @@ RUN wget https://github.com/duckdb/duckdb/releases/download/v0.10.0/duckdb_cli-l
 # Install Python packages
 RUN pip install --no-cache-dir \
     dbt-duckdb==1.7.3 \
+    dbt-snowflake==1.7.3 \
     duckdb==0.10.0 \
-    pandas==2.2.0
+    pandas==2.2.0 \
+    snowflake-connector-python
 
 # Copy project files
 COPY dbt_project /app/dbt_project

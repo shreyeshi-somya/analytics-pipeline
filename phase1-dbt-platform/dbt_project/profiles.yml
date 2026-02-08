@@ -1,11 +1,22 @@
 ecomm:
-  target: dev
+  target: duckdb  # Default to DuckDB
   outputs:
-    dev:
+    duckdb:
       type: duckdb
       path: /app/duckdb/analytics.duckdb
       threads: 4
       extensions:
         - parquet
       settings:
-        TimeZone: 'UTC'  
+        TimeZone: 'UTC'
+    
+    snowflake:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: ACCOUNTADMIN
+      database: ECOMM_ANALYTICS
+      warehouse: COMPUTE_WH
+      schema: RAW
+      threads: 4

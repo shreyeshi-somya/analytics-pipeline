@@ -20,7 +20,7 @@ select
     , total_delivered_orders > 1 as has_repeat_orders
     , count(distinct case when is_in_progress then order_id else null end) as in_progress_orders
     , count(distinct case when is_canceled then order_id else null end) as canceled_orders
-    , canceled_orders::float/total_orders_all_statuses as cancellation_rate
+    , canceled_orders::float / nullif(total_orders_all_statuses,0) as cancellation_rate
 
     -- Order - Item Metrics
     , count(distinct case when is_delivered then order_item_key end) as total_items_sold
@@ -38,18 +38,18 @@ select
     
     -- Delivery performance
     , avg(case when is_delivered then days_to_delivery end) as avg_delivery_days
-    , count(case when is_delivered and is_delivered_on_time then order_id end)::float/total_delivered_orders as on_time_delivery_rate
+    , count(case when is_delivered and is_delivered_on_time then order_id end)::float / nullif(total_delivered_orders,0) as on_time_delivery_rate
     
     -- Reviews - Customer satisfaction
     , avg(case when has_review then review_score end) as avg_review_score
     , count(case when has_review then order_id end) as reviewed_orders
-    , count(case when review_sentiment = 'positive' then order_id end)::float/ reviewed_orders as positive_review_rate
+    , count(case when review_sentiment = 'positive' then order_id end)::float / nullif(reviewed_orders,0) as positive_review_rate
 
     -- Dates
     , min(case when is_delivered then order_purchase_timestamp_et end) as first_sale_date
     , max(case when is_delivered then order_purchase_timestamp_et end) as last_sale_date
     -- Seller activity
-    , date_diff('day', first_sale_date, last_sale_date) as seller_tenure_days
+    , datediff('day', first_sale_date, last_sale_date) as seller_tenure_days
 
 from {{ ref('int_order_items') }}
 {{ dbt_utils.group_by(6) }}

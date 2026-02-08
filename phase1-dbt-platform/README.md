@@ -2,6 +2,8 @@
 
 A production-grade data transformation pipeline built with dbt, DuckDB, and Docker, demonstrating modern analytics engineering best practices.
 
+**Extended in Phase 1.5:** Deployed to Snowflake cloud data warehouse with dual-target support.
+
 ---
 
 ## Overview
@@ -13,14 +15,22 @@ This phase implements a comprehensive dbt project that transforms raw Brazilian 
 - **Custom macros** for reusable business logic
 - **Dimensional modeling** with fact and dimension tables
 - **Dockerized environment** for reproducibility
+- **Dual-target deployment** (DuckDB + Snowflake)
 
 ---
 
 ## Tech Stack
 
+**Local Development:**
 - **Transformation:** dbt Core 1.7.3
 - **Database:** DuckDB 0.10.0
 - **Orchestration:** Docker & Docker Compose
+
+**Cloud Production (Phase 1.5):**
+- **Cloud Warehouse:** Snowflake (AWS US-East-1)
+- **Adapter:** dbt-snowflake 1.7.3
+
+**Common:**
 - **Languages:** SQL, Python
 - **Testing:** dbt tests (generic, singular, custom)
 - **Documentation:** dbt docs, YAML schemas
@@ -34,21 +44,33 @@ This phase implements a comprehensive dbt project that transforms raw Brazilian 
 Raw CSVs → Staging → Intermediate → Marts → Analysis
 ```
 
+### Deployment Options
+
+**DuckDB (Local):**
+```bash
+dbt build              # Fast local development
+```
+
+**Snowflake (Cloud):**
+```bash
+dbt build --target snowflake    # Production deployment
+```
+
 ### Layer Breakdown
 
-**Staging Layer** (8 models)
+**Staging Layer** (9 models)
 - Clean and type raw data
 - 1:1 relationship with source tables
 - Timezone conversions
 - Basic data quality checks
 
-**Intermediate Layer** (6 models)
+**Intermediate Layer** (9 models)
 - Business logic and calculations
 - Joins and enrichment
 - Deduplication
 - Complex transformations
 
-**Marts Layer** (5 models)
+**Marts Layer** (6 models)
 - Dimensional models (facts & dimensions)
 - Aggregated metrics
 - Analytics-ready tables
@@ -79,17 +101,24 @@ Organized by transformation layer with clear separation of concerns.
 - `int_order_items` - Items with product, seller, and order context
 - `int_order_reviews` - Deduplicated reviews (one per order)
 - `int_order_payments` - Aggregated payment details by order
+- `int_order_payments__by_type` - Payment details aggregated by payment type (grain: order_id + payment_type, preserves multiple payment methods per order)
 - `int_customers` - Customer profiles with geolocation
 - `int_sellers` - Seller profiles with geolocation
 - `int_products` - Product catalog with category translations
 - `int_geolocation` - Deduplicated geolocation by zip code
 
 ### Marts Models
+
+**Dimensions**
 - `dim_customers` - Customer dimension with lifetime metrics
 - `dim_products` - Product dimension with sales performance
 - `dim_sellers` - Seller dimension with performance metrics
-- `fct_orders` - Order fact table with comprehensive metrics
-- `fct_order_items` - Order line item fact table (wide denormalized)
+
+**Facts**
+- `fact_orders` - Order fact table with comprehensive metrics
+- `fact_order_items` - Order line item fact table (wide denormalized)  
+- `mart_order_item` - Wide denormalized fact table pre-joined with all dimensions for BI tool performance
+
 
 ---
 
@@ -97,14 +126,19 @@ Organized by transformation layer with clear separation of concerns.
 
 ### 1. Custom Macros
 
-**Timezone Conversion**
+**Timezone Conversion** (`macros/timestamp_macros.sql`)
 
 ![Timezone Macro](docs/images/macro.png)
 
 Reusable macro for converting timestamps across timezones:
 - Treats source timestamps as São Paulo time (UTC-3)
 - Converts to Eastern Time for US-based analysis
+- Database-aware: Uses `CONVERT_TIMEZONE()` for Snowflake, `AT TIME ZONE` for DuckDB
 - Used across all timestamp columns in staging layer
+
+**Custom Schema Name** (`macros/generate_schema_name.sql`)
+
+Overrides dbt's default schema naming behavior. When a custom schema is specified in a model's config, the model is created directly in that schema (e.g., `staging`, `intermediate`, `marts`) rather than being prefixed with the target schema (e.g., `dev_staging`). If no custom schema is specified, it falls back to the target schema.
 
 ### 2. Data Quality Framework
 
@@ -139,23 +173,33 @@ Every model documented with:
 
 ## Build Results
 
-### Staging Layer
+### DuckDB (Local Development)
+
+**Staging Layer:**
 
 ![Staging Build](docs/images/staging_models.png)
 
 8 models built successfully with data quality tests passing.
 
-### Intermediate Layer
+**Intermediate Layer:**
 
 ![Intermediate Build](docs/images/intermediate_models.png)
 
-6 models with complex business logic and joins executed successfully.
+8 models with complex business logic and joins executed successfully.
 
-### Marts Layer
+**Marts Layer:**
 
 ![Marts Build](docs/images/mart_models.png)
 
 5 dimensional models created and tested, ready for analytics.
+
+### Snowflake (Cloud Production)
+
+**See [SNOWFLAKE.md](SNOWFLAKE.md) for detailed cloud deployment documentation.**
+
+![Snowflake Tables](docs/images/snowflake/tables.png)
+
+All models successfully deployed to Snowflake with proper schema organization.
 
 ---
 
@@ -181,7 +225,7 @@ Customer dimension showing:
 
 ### Fact: Orders
 
-![fact_orders](docs/images/fact_order.png)
+![fct_orders](docs/images/fact_order.png)
 
 Order fact table including:
 - Order totals and item counts
@@ -192,7 +236,7 @@ Order fact table including:
 
 ### Fact: Order Items (Wide Table)
 
-![fact_order_items](docs/images/mart_order_item.png)
+![fct_order_items](docs/images/mart_order_item.png)
 
 Comprehensive order line item table with:
 - Item-level pricing and freight
@@ -253,12 +297,13 @@ Comprehensive order line item table with:
 ```bash
 - Docker Desktop
 - Git
+- (Optional) Snowflake account for cloud deployment
 ```
 
-### Setup
+### Setup - Local Development (DuckDB)
 ```bash
 # Clone repository
-git clone https://github.com/YOUR_USERNAME/analytics-pipeline.git
+git clone https://github.com/shreyeshi-somya/analytics-pipeline.git
 cd analytics-pipeline/phase1-dbt-platform
 
 # Start Docker environment
@@ -277,6 +322,21 @@ dbt run               # Build all models
 dbt test              # Run all tests
 dbt build             # Run and test all models  
 dbt docs generate     # Generate documentation
+```
+
+### Setup - Cloud Production (Snowflake)
+
+**See [SNOWFLAKE.md](SNOWFLAKE.md) for complete cloud deployment guide.**
+```bash
+# Create .env file with Snowflake credentials
+# SNOWFLAKE_ACCOUNT=your_account.us-east-1
+# SNOWFLAKE_USER=your_username
+# SNOWFLAKE_PASSWORD=your_password
+
+# Deploy to Snowflake
+dbt seed --target snowflake
+dbt run --target snowflake
+dbt test --target snowflake
 ```
 
 ---
@@ -326,9 +386,24 @@ dbt docs generate     # Generate documentation
 
 ### Performance Optimizations
 - Materialized tables for marts layer
-- Views for staging and intermediate layers
 - Surrogate keys for efficient joins
 - Denormalized wide tables for BI tools
+
+### Cross-Database Compatibility
+
+All SQL logic has been written to be compatible with both **DuckDB** (local development) and **Snowflake** (cloud production):
+
+- **Database-aware macros** - Conditional logic based on `target.type`
+- **Timezone functions** - `CONVERT_TIMEZONE()` for Snowflake, `AT TIME ZONE` for DuckDB
+- **Standard SQL** - ANSI-compliant where possible
+- **Date functions** - `DATEDIFF()` works in both databases
+- **Boolean aggregation** - `MAX()` replaces database-specific `BOOL_OR()`
+
+This dual-target approach enables:
+- Fast local iteration with DuckDB
+- Production deployment on Snowflake
+- Single codebase for both environments
+- Smooth migration path to cloud
 
 ### Best Practices Demonstrated
 - Modular SQL with CTEs
@@ -337,22 +412,42 @@ dbt docs generate     # Generate documentation
 - Clear naming conventions
 - Detailed documentation
 - Version-controlled transformations
+- Cross-platform SQL compatibility
+- Environment variable management
+- Multi-environment deployment
 
 ---
 
 ## Project Stats
 
-- **Total Models:** 19 (8 staging + 6 intermediate + 5 marts)
+- **Total Models:** 21 (8 staging + 8 intermediate + 5 marts)
 - **Total Tests:** 30+
-- **Custom Macros:** 2
-- **Custom Tests:** 2
-- **Seed Files:** 1
+- **Custom Macros:** 3 (timezone conversion, schema naming, generic tests)
+- **Custom Tests:** 2 (positive_values, non_negative_values)
+- **Seed Files:** 1 (brazilian_holidays)
+- **Deployment Targets:** 2 (DuckDB, Snowflake)
 - **Lines of SQL:** 1,500+
+
+---
+
+## Cloud Deployment (Phase 1.5)
+
+**Status:** ✅ Complete
+
+This project has been successfully deployed to Snowflake cloud data warehouse:
+- 1M+ rows migrated across 9 source tables
+- All 21 models deployed and tested
+- ~220MB total storage (compressed)
+- Dual-target architecture maintained
+
+**[View Snowflake Migration Details →](SNOWFLAKE.md)**
 
 ---
 
 ## Author
 
-**[Shreyeshi Somya]** 
+**Shreyeshi Somya**  
 
-**Skills Demonstrated:** dbt, SQL, Data Modeling, Docker, Data Quality, Analytics Engineering
+**Skills Demonstrated:** dbt, SQL, Data Modeling, Docker, Data Quality, Analytics Engineering, Snowflake, Cloud Data Warehousing, Multi-Environment Deployment
+
+---
