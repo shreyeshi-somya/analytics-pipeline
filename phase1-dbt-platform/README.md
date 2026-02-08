@@ -234,7 +234,7 @@ Order fact table including:
 - Review sentiment
 - Holiday flags
 
-### Fact: Order Items (Wide Table)
+### Mart: Order Items (Wide Table)
 
 ![fct_order_items](docs/images/mart_order_item.png)
 
