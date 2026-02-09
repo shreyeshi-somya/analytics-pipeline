@@ -274,6 +274,14 @@ Comprehensive order line item table with:
 - 26 holidays across 2016-2018
 - Joined to orders for holiday shopping pattern analysis
 
+**Product Category Rollup** - High-level category grouping
+- Maps 71 English product categories to broad categories (e.g., Electronics & Tech, Home & Living, Fashion & Accessories)
+- Joined in `stg_product_category_name` on `product_category_name_english`
+
+**Brazil States with Regions** - Geographic region mapping
+- Maps 27 Brazilian state abbreviations to full state names and geographic regions (North, Northeast, Central-West, Southeast, South)
+- Joined in `stg_geolocation` on `geolocation_state`
+
 ### Surrogate Keys
 
 - Generated composite keys using `dbt_utils.generate_surrogate_key`
@@ -317,7 +325,7 @@ docker compose exec dbt bash
 python /app/scripts/load_data.py
 
 # Run dbt pipeline
-dbt seed              # Load Brazilian holidays
+dbt seed              # Load seed data (holidays, category rollup, states)
 dbt run               # Build all models
 dbt test              # Run all tests
 dbt build             # Run and test all models  
@@ -420,11 +428,11 @@ This dual-target approach enables:
 
 ## Project Stats
 
-- **Total Models:** 24 (9 staging + 9 intermediate + 4 marts)
+- **Total Models:** 24 (9 staging + 9 intermediate + 6 marts)
 - **Total Tests:** 30+
-- **Custom Macros:** 2 (timezone conversion, schema naming)
+- **Custom Macros:** 3 (timezone conversion, schema naming, data validation)
 - **Custom Tests:** 3 (non_negative_values, error_excessive_canceled_with_delivery, warn_canceled_orders_with_delivery)
-- **Seed Files:** 1 (brazilian_holidays)
+- **Seed Files:** 3 (brazilian_holidays, product_category_rollup, brazil_states_with_regions)
 - **Deployment Targets:** 2 (DuckDB, Snowflake)
 - **Lines of SQL:** 1,500+
 

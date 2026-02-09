@@ -220,8 +220,26 @@ models:
       - name: review_answer_timestamp_et
         description: Timestamp when review was answered converted to Eastern
         
+  - name: stg_geolocation
+    description: Brazilian zip code coordinates with state and region information
+    columns:
+      - name: geolocation_zip_code_prefix
+        description: First 5 digits of zip code
+      - name: geolocation_latitude
+        description: Latitude coordinate
+      - name: geolocation_longitude
+        description: Longitude coordinate
+      - name: geolocation_city
+        description: City name
+      - name: geolocation_state
+        description: State abbreviation (2-letter code)
+      - name: geolocation_state_name
+        description: Full state name from brazil_states_with_regions seed
+      - name: geolocation_region
+        description: Brazilian geographic region (North, Northeast, Central-West, Southeast, South) from brazil_states_with_regions seed
+
   - name: stg_product_category_name
-    description: Translation of product categories from Portuguese to English
+    description: Translation of product categories from Portuguese to English with broad category rollup
     columns:
       - name: product_category_name
         description: Category name in Portuguese
@@ -230,3 +248,5 @@ models:
           - not_null
       - name: product_category_name_english
         description: Category name in English
+      - name: broad_category
+        description: High-level category grouping from product_category_rollup seed (e.g., Electronics & Tech, Home & Living, Fashion & Accessories)

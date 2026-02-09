@@ -16,6 +16,7 @@ select
     , product.product_height_cm
     , product.product_width_cm
     , product_category_name.product_category_name_english
+    , product_category_name.broad_category
 
 from {{ ref('stg_products') }} product
 left join {{ ref('stg_product_category_name') }} product_category_name on product.product_category_name = product_category_name.product_category_name

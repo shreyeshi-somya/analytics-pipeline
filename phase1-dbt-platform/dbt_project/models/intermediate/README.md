@@ -16,22 +16,22 @@ The intermediate layer applies business logic, enrichments, and aggregations on 
 
 | Model | Grain | Description |
 |-------|-------|-------------|
-| `int_geolocation` | One row per zip code prefix | Deduplicated geolocation - selects most common lat/long per zip code |
+| `int_geolocation` | One row per zip code prefix | Deduplicated geolocation - selects most common lat/long per zip code; enriched with state name and region from the `brazil_states_with_regions` seed |
 
 ### Entity Enrichment
 
 | Model | Grain | Description |
 |-------|-------|-------------|
-| `int_customers` | One row per `customer_id` (unique per order) | Customers enriched with geolocation coordinates via `int_geolocation`. Note: `customer_id` is unique per order, not per person - use `customer_unique_id` to identify the same customer across orders |
-| `int_products` | One row per product | Products joined with English category name translations |
-| `int_sellers` | One row per seller | Sellers enriched with geolocation coordinates via `int_geolocation` |
+| `int_customers` | One row per `customer_id` (unique per order) | Customers enriched with geolocation coordinates, state name, and region via `int_geolocation`. Note: `customer_id` is unique per order, not per person - use `customer_unique_id` to identify the same customer across orders |
+| `int_products` | One row per product | Products joined with English category name translations and broad category grouping from the `product_category_rollup` seed |
+| `int_sellers` | One row per seller | Sellers enriched with geolocation coordinates, state name, and region via `int_geolocation` |
 
 ### Order Domain
 
 | Model | Grain | Description |
 |-------|-------|-------------|
-| `int_order` | One row per order | Central order model joining orders with customer details, reviews, and payments; adds delivery flags, speed categories, and review sentiment |
-| `int_order_items` | One row per order line item | Order items enriched with order attributes, product dimensions, shipping weight calculations, and seller location with coordinates |
+| `int_order` | One row per order | Central order model joining orders with customer details, reviews, and payments; adds delivery flags, speed categories, review sentiment, customer state name, and customer region |
+| `int_order_items` | One row per order line item | Order items enriched with order attributes, product dimensions, broad category, shipping weight calculations, seller location with coordinates, and geographic regions for both customer and seller |
 | `int_order_reviews` | One row per order | Deduplicated reviews - consolidates multiple reviews per order into a single record |
 | `int_order_payments__by_type` | One row per order + payment type | Payment transactions aggregated by payment type within each order |
 | `int_order_payments` | One row per order | Order-level payment summary with breakdowns by payment method |
@@ -53,6 +53,8 @@ Deduplicates raw geolocation data which has multiple entries per zip code due to
 - `geolocation_zip_code_prefix` - Unique zip code prefix (primary key after dedup)
 - `geolocation_latitude`, `geolocation_longitude` - Most common coordinates
 - `geolocation_city`, `geolocation_state` - City/state for the selected coordinates
+- `geolocation_state_name` - Full state name (e.g., "São Paulo") from the `brazil_states_with_regions` seed
+- `geolocation_region` - Geographic region (North, Northeast, Central-West, Southeast, South) from the `brazil_states_with_regions` seed
 
 ---
 
@@ -69,17 +71,20 @@ Enriches customer records with geographic coordinates by joining to deduplicated
 **Key columns added:**
 - `customer_geolocation_latitude`, `customer_geolocation_longitude` - Coordinates from geolocation lookup
 - `customer_geolocation_city`, `customer_geolocation_state` - Geo-derived city/state for cross-referencing
+- `customer_state_name` - Full state name from the `brazil_states_with_regions` seed (via `int_geolocation`)
+- `customer_region` - Geographic region (North, Northeast, Central-West, Southeast, South) from the `brazil_states_with_regions` seed (via `int_geolocation`)
 
 ---
 
 ### int_products
 
-Joins the product catalog with the category name translation table to provide English category names alongside Portuguese originals.
+Joins the product catalog with the category name translation table to provide English category names alongside Portuguese originals, and includes the broad category grouping from the `product_category_rollup` seed.
 
 **Sources:** `stg_products`, `stg_product_category_name`
 
 **Key columns added:**
 - `product_category_name_english` - English translation of product category
+- `broad_category` - High-level category grouping (e.g., "Electronics & Tech", "Home & Living") from the `product_category_rollup` seed (via `stg_product_category_name`)
 
 ---
 
@@ -92,6 +97,8 @@ Enriches seller records with geographic coordinates by joining to deduplicated g
 **Key columns added:**
 - `seller_geolocation_latitude`, `seller_geolocation_longitude` - Coordinates from geolocation lookup
 - `seller_geolocation_city`, `seller_geolocation_state` - Geo-derived city/state for cross-referencing
+- `seller_state_name` - Full state name from the `brazil_states_with_regions` seed (via `int_geolocation`)
+- `seller_region` - Geographic region (North, Northeast, Central-West, Southeast, South) from the `brazil_states_with_regions` seed (via `int_geolocation`)
 
 ---
 
@@ -162,7 +169,7 @@ Enriches order line items with order-level attributes, product details, shipping
 - `customer_unique_id`, `order_status`, `order_purchase_timestamp_et`, `order_delivered_customer_date_et`
 - `is_delivered`, `is_in_progress`, `is_canceled`, `is_delivered_on_time`
 - `days_to_delivery`, `delivery_speed_category`
-- `customer_city`, `customer_state`
+- `customer_city`, `customer_state`, `customer_state_name`, `customer_region`
 - `review_score`, `review_sentiment`, `has_review`
 - `total_payment_value`, `total_payment_installments`
 
@@ -180,6 +187,7 @@ Enriches order line items with order-level attributes, product details, shipping
 
 *Product Attributes (from `int_products`):*
 - `product_category_name_english` - English category name
+- `broad_category` - High-level category grouping (e.g., "Electronics & Tech", "Home & Living")
 - `product_name_length`, `product_description_length` - Listing quality metrics
 - `is_high_value_item` - Flag for items >$100
 - `has_photos`, `has_detailed_description` - Product listing quality flags
@@ -187,6 +195,7 @@ Enriches order line items with order-level attributes, product details, shipping
 *Seller (from `int_sellers`):*
 - `seller_city`, `seller_state`, `seller_zip_code_prefix` - Seller location
 - `seller_geolocation_latitude`, `seller_geolocation_longitude` - Seller coordinates
+- `seller_state_name`, `seller_region` - Full state name and geographic region
 
 ---
 
@@ -214,6 +223,7 @@ The central order-level model that brings together orders, customer details, rev
 *Customer Fields (from `int_customers`):*
 - `customer_unique_id` - Unique customer identifier across all orders
 - `customer_zip_code_prefix`, `customer_city`, `customer_state` - Customer location
+- `customer_state_name`, `customer_region` - Full state name and geographic region
 - `customer_geolocation_latitude`, `customer_geolocation_longitude` - Customer coordinates
 
 *Review Fields (from `int_order_reviews`):*
@@ -231,6 +241,8 @@ The central order-level model that brings together orders, customer details, rev
 
 ```
 stg_geolocation ────────┐
+brazil_states_with_     │
+  regions (seed) ───────┤
                         ├──▶ int_geolocation ──────┐
                         │                          │
 stg_customers ──────────┤                          │
@@ -241,6 +253,9 @@ stg_sellers ────────────┤         │                �
                         │         │
 stg_products ───────────┤         │
 stg_product_category ───┤         │
+  (joins product_       │         │
+   category_rollup      │         │
+   seed)                │         │
                         ├──▶ int_products ─────┐
                         │                      │
 stg_order_reviews ──────┤                      │

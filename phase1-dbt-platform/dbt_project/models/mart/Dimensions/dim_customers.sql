@@ -14,7 +14,9 @@ select
     , max_by(customer_zip_code_prefix, order_purchase_timestamp_et) as customer_zip_code_prefix
     , max_by(customer_geolocation_latitude, order_purchase_timestamp_et) as customer_geolocation_latitude
     , max_by(customer_geolocation_longitude, order_purchase_timestamp_et) as customer_geolocation_longitude
-    
+    , max_by(customer_state_name, order_purchase_timestamp_et) as customer_state_name
+    , max_by(customer_region, order_purchase_timestamp_et) as customer_region
+
     -- Aggregated metrics
     , count(order_id) as total_orders_all_statuses
     , count(case when is_delivered then order_id else null end) as total_delivered_orders

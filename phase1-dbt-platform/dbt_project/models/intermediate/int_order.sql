@@ -43,6 +43,8 @@ select
     , customers.customer_state
     , customers.customer_geolocation_latitude
     , customers.customer_geolocation_longitude
+    , customers.customer_state_name
+    , customers.customer_region
 
     -- Review Details
     , reviews.review_id

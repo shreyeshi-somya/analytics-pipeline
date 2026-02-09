@@ -36,6 +36,8 @@ select
     , orders.customer_state
     , orders.customer_geolocation_latitude
     , orders.customer_geolocation_longitude
+    , orders.customer_state_name
+    , orders.customer_region
 
     -- Review Details
     , orders.review_id

@@ -37,7 +37,7 @@ ECOMM_ANALYTICS (Database)
 ├── STAGING (9 models)
 ├── INTERMEDIATE (9 models)
 ├── MARTS (6 models)
-└── SEEDS (1, brazilian_holidays)
+└── SEEDS (3: brazilian_holidays, product_category_rollup, brazil_states_with_regions)
 ```
 
 ### Data Flow
@@ -87,7 +87,17 @@ Loaded via Snowflake UI:
 - Zip codes: VARCHAR (preserve leading zeros)
 - Timestamps: TIMESTAMP_NTZ (no timezone)
 
-### 3. dbt Configuration
+### 3. Seed Data
+
+Three seed files are loaded via `dbt seed --target snowflake` and used to enrich models across all layers:
+
+| Seed | Rows | Purpose |
+|------|------|---------|
+| `brazilian_holidays` | 26 | Holiday flags on orders (joined in `fact_order`) |
+| `product_category_rollup` | 71 | Maps English product categories to broad groupings like "Electronics & Tech", "Home & Living" (joined in `stg_product_category_name`) |
+| `brazil_states_with_regions` | 27 | Maps state abbreviations to full names and geographic regions — North, Northeast, Central-West, Southeast, South (joined in `stg_geolocation`) |
+
+### 4. dbt Configuration
 
 **Added to Dockerfile:**
 ```dockerfile
@@ -196,7 +206,7 @@ dbt run --target snowflake # Snowflake
 
 ![Marts Models](docs/images/snowflake/mart_models.png)
 
-5 dimensional models (3 dimensions + 2 facts + 1 mart) ready for analytics.
+6 models (3 dimensions + 2 facts + 1 denormalized mart) ready for analytics.
 
 ---
 
@@ -206,7 +216,7 @@ dbt run --target snowflake # Snowflake
 
 ![dim_customers](docs/images/snowflake/dim_customers.png)
 
-Customer dimension with lifetime metrics, behavioral flags, and geographic attributes.
+Customer dimension with lifetime metrics, behavioral flags, geographic attributes, state name, and region.
 
 ### Fact: Orders
 
@@ -218,7 +228,7 @@ Order fact table with comprehensive metrics including delivery performance, paym
 
 ![fct_order_items](docs/images/snowflake/mart_order_item.png)
 
-Wide denormalized order line item table with product, seller, and customer context pre-joined for BI performance.
+Wide denormalized order line item table with product (including broad category), seller, and customer context (including geographic regions) pre-joined for BI performance.
 
 ---
 

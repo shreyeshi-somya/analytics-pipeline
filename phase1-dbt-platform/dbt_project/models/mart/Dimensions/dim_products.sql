@@ -11,6 +11,7 @@ select
     -- Product attributes
     , product_category_name
     , product_category_name_english
+    , broad_category
     , product_weight_g
     , product_length_cm
     , product_height_cm
@@ -50,4 +51,4 @@ select
     , max(case when is_delivered then order_purchase_timestamp_et end) as last_sale_date
 
 from {{ ref('int_order_items') }}
-{{ dbt_utils.group_by(14) }}
+{{ dbt_utils.group_by(15) }}

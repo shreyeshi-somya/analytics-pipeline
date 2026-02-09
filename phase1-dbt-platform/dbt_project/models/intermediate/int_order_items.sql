@@ -33,6 +33,8 @@ select
     , orders.delivery_speed_category
     , orders.customer_city
     , orders.customer_state
+    , orders.customer_state_name
+    , orders.customer_region
     , orders.review_score
     , orders.review_sentiment
     , orders.has_review
@@ -44,6 +46,7 @@ select
     , product.product_description_length
     , product.product_category_name
     , product.product_category_name_english
+    , product.broad_category
     , product.product_weight_g
     , product.product_length_cm
     , product.product_height_cm
@@ -95,6 +98,8 @@ select
     , seller.seller_zip_code_prefix
     , seller.seller_geolocation_latitude
     , seller.seller_geolocation_longitude
+    , seller.seller_state_name
+    , seller.seller_region
 
 from {{ ref('stg_order_items') }} order_items
 left join {{ ref('int_order') }} orders on order_items.order_id = orders.order_id

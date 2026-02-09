@@ -31,6 +31,8 @@ select
     , delivery_speed_category
     , customer_city
     , customer_state
+    , customer_state_name
+    , customer_region
     , review_score
     , review_sentiment
     , has_review
@@ -46,6 +48,7 @@ select
     , product_description_length
     , product_category_name
     , product_category_name_english
+    , broad_category
     , product_weight_g
     , product_length_cm
     , product_height_cm
@@ -66,7 +69,7 @@ select
     , seller_zip_code_prefix
     , seller_geolocation_latitude
     , seller_geolocation_longitude
-
-    
+    , seller_state_name
+    , seller_region
 
 from {{ ref('int_order_items') }}

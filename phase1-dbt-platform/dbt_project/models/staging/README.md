@@ -20,8 +20,8 @@ The staging layer provides cleaned, typed, and lightly transformed data from raw
 | `stg_order_reviews` | `raw.order_reviews` | One row per review | Customer ratings and comments |
 | `stg_products` | `raw.products` | One row per product | Product catalog with physical dimensions |
 | `stg_sellers` | `raw.sellers` | One row per seller | Seller information and location |
-| `stg_geolocation` | `raw.geolocation` | One row per geolocation entry | Brazilian zip code coordinates (not yet deduplicated) |
-| `stg_product_category_name` | `raw.product_category_name` | One row per category | Portuguese to English category translation |
+| `stg_geolocation` | `raw.geolocation` | One row per geolocation entry | Brazilian zip code coordinates (not yet deduplicated); enriched with state name and region from the `brazil_states_with_regions` seed |
+| `stg_product_category_name` | `raw.product_category_name` | One row per category | Portuguese to English category translation; enriched with broad category from the `product_category_rollup` seed |
 
 ## Key Transformations
 
@@ -67,6 +67,11 @@ In `stg_orders`, missing `order_approved_at` values are backfilled for orders th
 ### Boolean Flags
 
 - `stg_order_reviews.is_comment_present` - TRUE if review has a title or message
+
+### Seed Data Joins
+
+- `stg_product_category_name` joins the `product_category_rollup` seed on `product_category_name_english` to add `broad_category` (high-level category grouping like "Electronics & Tech", "Home & Living", etc.)
+- `stg_geolocation` joins the `brazil_states_with_regions` seed on `geolocation_state` = `state_abbreviation` to add `geolocation_state_name` (full state name) and `geolocation_region` (North, Northeast, Central-West, Southeast, South)
 
 ## Data Quality
 
@@ -194,6 +199,10 @@ sources:
       # ... etc
 ```
 
+Additionally, 3 seed files are used to enrich staging models:
+- `product_category_rollup`
+- `brazil_states_with_regions`
+
 ## Downstream Usage
 
 Staging models are consumed by:
@@ -222,5 +231,5 @@ Staging models are consumed by:
 
 ---
 
-**Last Updated:** 2025-02-07  
+**Last Updated:** 2025-02-09  
 **Maintained By:** Shreyeshi Somya

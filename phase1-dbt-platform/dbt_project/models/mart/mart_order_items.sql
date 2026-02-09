@@ -40,6 +40,8 @@ select
     , fact.delivery_speed_category
     , fact.customer_city
     , fact.customer_state
+    , fact.customer_state_name
+    , fact.customer_region
     , fact.review_score
     , fact.review_sentiment
     , fact.has_review
@@ -54,6 +56,7 @@ select
     , fact.product_description_length
     , fact.product_category_name
     , fact.product_category_name_english
+    , fact.broad_category
     , fact.product_weight_g
     , fact.product_length_cm
     , fact.product_height_cm
@@ -74,6 +77,8 @@ select
     , fact.seller_zip_code_prefix
     , fact.seller_geolocation_latitude
     , fact.seller_geolocation_longitude
+    , fact.seller_state_name
+    , fact.seller_region
 
     -- ========================================================================
     -- Dimension: Customer Aggregated Metrics (from dim_customers)
@@ -129,6 +134,7 @@ select
     -- ========================================================================
     -- Dimension: Product Aggregated Metrics (from dim_products)
     -- ========================================================================
+    , dim_prod.broad_category as product_broad_category
     , dim_prod.total_orders as product_total_orders
     , dim_prod.total_units_sold as product_total_units_sold
     , dim_prod.total_revenue as product_total_revenue

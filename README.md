@@ -49,7 +49,7 @@ phase1-dbt-platform/
 │   │   └── marts/          # Final analytical models (6 models)
 │   ├── macros/             # Custom reusable SQL functions (3 macros)
 │   ├── tests/              # Data quality tests (30+ tests)
-│   └── seeds/              # Reference data (Brazilian holidays)
+│   └── seeds/              # Reference data (3 seed files)
 ├── data/
 │   └── raw/               # Source CSV files (not committed)
 ├── scripts/
@@ -102,12 +102,12 @@ phase1-dbt-platform/
 - Time period: Sept 2016 - Dec 2018
 
 **Dimensional Model:**
-- `dim_customers` - Customer lifetime metrics and behavior
-- `dim_products` - Product performance and attributes
-- `dim_sellers` - Seller performance and ratings
-- `fact_orders` - Order-level transactions with delivery tracking and holiday flags
-- `fact_order_items` - Item-level details with product, seller, and order context
-- `mart_order_items` - Wide denormalized table pre-joined for BI tool performance
+- `dim_customers` - Customer lifetime metrics, behavior, and geographic region
+- `dim_products` - Product performance, attributes, and broad category grouping
+- `dim_sellers` - Seller performance, ratings, and geographic region
+- `fact_order` - Order-level transactions with delivery tracking, holiday flags, and customer region
+- `fact_order_items` - Item-level details with product broad category, seller/customer regions, and shipping logistics
+- `mart_order_items` - Wide denormalized table pre-joined with all dimensions for BI tool performance
 
 ### Highlights
 
@@ -117,15 +117,17 @@ phase1-dbt-platform/
 - Payment method aggregation and categorization
 - Missing data imputation (order approval timestamps)
 - Geolocation deduplication by zip code
+- Seed-based enrichments (broad product categories, state names, geographic regions)
 
 **Data Quality Insights:**
 - Identified data quality issues (5 canceled orders with delivery dates)
 - Implemented threshold-based monitoring
 - Documented edge cases and business rules
 
-**Reference Data:**
-- Brazilian holidays seed file (26 holidays, 2016-2018)
-- Enables holiday shopping pattern analysis
+**Reference Data (3 Seed Files):**
+- Brazilian holidays (26 holidays, 2016-2018) — holiday shopping pattern analysis
+- Product category rollup — maps 71 categories to broad groupings (e.g., Electronics & Tech, Home & Living)
+- Brazil states with regions — maps 27 states to geographic regions (North, Northeast, Central-West, Southeast, South)
 
 ### Getting Started
 
@@ -151,7 +153,7 @@ docker compose exec dbt bash
 python /app/scripts/load_data.py
 
 # Run dbt pipeline
-dbt seed              # Load Brazilian holidays
+dbt seed              # Load seed data (holidays, category rollup, states)
 dbt run               # Build all models
 dbt test              # Run all tests
 dbt docs generate     # Generate documentation
@@ -175,7 +177,7 @@ dbt test --target snowflake
 - ✅ Data quality framework (30+ tests)
 - ✅ Custom macros (3: timezone conversion, schema naming, data validation)
 - ✅ Custom generic tests (2: positive_values, non_negative_values)
-- ✅ Seed data (Brazilian holidays reference table)
+- ✅ Seed data (3 files: Brazilian holidays, product category rollup, Brazil states/regions)
 - ✅ Comprehensive documentation (YAML schemas, inline comments)
 - ✅ Project README with architecture and screenshots
 
@@ -209,7 +211,7 @@ ECOMM_ANALYTICS (Database)
 ├── STAGING (9 models)
 ├── INTERMEDIATE (9 models)
 ├── MARTS (6 models)
-└── SEEDS (1, brazilian_holidays)
+└── SEEDS (3: brazilian_holidays, product_category_rollup, brazil_states_with_regions)
 ```
 
 ### SQL Compatibility Changes

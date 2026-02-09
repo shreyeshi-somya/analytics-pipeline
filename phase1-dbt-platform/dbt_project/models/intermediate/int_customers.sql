@@ -17,6 +17,8 @@ select
     -- TODO: check if these match to the values from customer table
     , geolocation.geolocation_city as customer_geolocation_city
     , geolocation.geolocation_state as customer_geolocation_state
+    , geolocation.geolocation_state_name as customer_state_name
+    , geolocation.geolocation_region as customer_region
 
 from {{ ref('stg_customers') }} customers
 left join {{ ref('int_geolocation') }} geolocation on customers.customer_zip_code_prefix = geolocation.geolocation_zip_code_prefix

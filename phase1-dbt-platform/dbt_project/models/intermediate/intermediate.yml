@@ -17,6 +17,10 @@ models:
         description: City name associated with the most common coordinates
       - name: geolocation_state
         description: State abbreviation associated with the most common coordinates
+      - name: geolocation_state_name
+        description: Full state name from brazil_states_with_regions seed
+      - name: geolocation_region
+        description: Brazilian geographic region (North, Northeast, Central-West, Southeast, South)
 
   - name: int_customers
     description: Customers enriched with geolocation coordinates via zip code prefix
@@ -39,9 +43,13 @@ models:
         description: City name from geolocation lookup
       - name: customer_geolocation_state
         description: State abbreviation from geolocation lookup
+      - name: customer_state_name
+        description: Full state name from geolocation lookup
+      - name: customer_region
+        description: Brazilian geographic region (North, Northeast, Central-West, Southeast, South)
 
   - name: int_products
-    description: Products joined with English category name translations
+    description: Products joined with English category name translations and broad category rollup
     columns:
       - name: product_id
         description: Unique identifier for each product
@@ -63,6 +71,8 @@ models:
         description: Product width in cm
       - name: product_category_name_english
         description: Product category translated to English
+      - name: broad_category
+        description: High-level category grouping (e.g., Electronics & Tech, Home & Living)
 
   - name: int_sellers
     description: Sellers enriched with geolocation coordinates via zip code prefix
@@ -83,6 +93,10 @@ models:
         description: City name from geolocation lookup
       - name: seller_geolocation_state
         description: State abbreviation from geolocation lookup
+      - name: seller_state_name
+        description: Full state name from geolocation lookup
+      - name: seller_region
+        description: Brazilian geographic region (North, Northeast, Central-West, Southeast, South)
 
   - name: int_order_reviews
     description: Deduplicated order reviews - one review per order with concatenated comments
@@ -219,8 +233,14 @@ models:
         description: Shipping cost as a percentage of product price
       - name: product_category_name
         description: Product category in Portuguese
+      - name: customer_state_name
+        description: Full state name of customer from geolocation
+      - name: customer_region
+        description: Brazilian geographic region of customer
       - name: product_category_name_english
         description: Product category translated to English
+      - name: broad_category
+        description: High-level product category grouping
       - name: product_weight_g
         description: Product weight in grams
       - name: product_length_cm
@@ -257,6 +277,10 @@ models:
         description: Seller latitude coordinate from geolocation lookup
       - name: seller_geolocation_longitude
         description: Seller longitude coordinate from geolocation lookup
+      - name: seller_state_name
+        description: Full state name of seller from geolocation
+      - name: seller_region
+        description: Brazilian geographic region of seller
 
   - name: int_order
     description: Central order model joining orders with customer details, reviews, and payments, with delivery flags and speed categories
@@ -310,6 +334,10 @@ models:
         description: Customer latitude coordinate from geolocation lookup
       - name: customer_geolocation_longitude
         description: Customer longitude coordinate from geolocation lookup
+      - name: customer_state_name
+        description: Full state name of customer from geolocation
+      - name: customer_region
+        description: Brazilian geographic region of customer
       - name: review_id
         description: Review identifier from int_order_reviews
       - name: review_score

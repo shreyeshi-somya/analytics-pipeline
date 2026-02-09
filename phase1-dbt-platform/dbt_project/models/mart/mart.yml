@@ -22,6 +22,10 @@ models:
         description: Most recent customer latitude (from latest order)
       - name: customer_geolocation_longitude
         description: Most recent customer longitude (from latest order)
+      - name: customer_state_name
+        description: Most recent full state name (from latest order)
+      - name: customer_region
+        description: Most recent Brazilian geographic region (from latest order)
       - name: total_orders_all_statuses
         description: Total number of orders across all statuses
         tests:
@@ -77,6 +81,10 @@ models:
         description: Seller latitude coordinate
       - name: seller_geolocation_longitude
         description: Seller longitude coordinate
+      - name: seller_state_name
+        description: Full state name of seller
+      - name: seller_region
+        description: Brazilian geographic region of seller
       - name: total_orders_all_statuses
         description: Total number of distinct orders across all statuses
         tests:
@@ -138,6 +146,8 @@ models:
         description: Product category in Portuguese
       - name: product_category_name_english
         description: Product category translated to English
+      - name: broad_category
+        description: High-level product category grouping (e.g., Electronics & Tech, Home & Living)
       - name: product_weight_g
         description: Product weight in grams
       - name: product_length_cm
@@ -250,6 +260,10 @@ models:
         description: Customer latitude coordinate from geolocation lookup
       - name: customer_geolocation_longitude
         description: Customer longitude coordinate from geolocation lookup
+      - name: customer_state_name
+        description: Full state name of customer
+      - name: customer_region
+        description: Brazilian geographic region of customer
       - name: review_id
         description: Review identifier
       - name: review_score
@@ -395,6 +409,10 @@ models:
         description: Customer city name
       - name: customer_state
         description: Customer state abbreviation
+      - name: customer_state_name
+        description: Full state name of customer
+      - name: customer_region
+        description: Brazilian geographic region of customer
       - name: review_score
         description: Rating from 1-5
       - name: review_sentiment
@@ -413,6 +431,8 @@ models:
         description: Product category in Portuguese
       - name: product_category_name_english
         description: Product category translated to English
+      - name: broad_category
+        description: High-level product category grouping
       - name: product_weight_g
         description: Product weight in grams
       - name: product_length_cm
@@ -449,6 +469,10 @@ models:
         description: Seller latitude coordinate
       - name: seller_geolocation_longitude
         description: Seller longitude coordinate
+      - name: seller_state_name
+        description: Full state name of seller
+      - name: seller_region
+        description: Brazilian geographic region of seller
 
   # ===========================================================================
   # Mart (Denormalized for Visualization)

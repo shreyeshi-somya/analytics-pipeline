@@ -12,6 +12,8 @@ select
     , seller_zip_code_prefix
     , seller_geolocation_latitude
     , seller_geolocation_longitude
+    , seller_state_name
+    , seller_region
 
     -- Aggregated metrics
     -- Order Metrics
@@ -52,4 +54,4 @@ select
     , datediff('day', first_sale_date, last_sale_date) as seller_tenure_days
 
 from {{ ref('int_order_items') }}
-{{ dbt_utils.group_by(6) }}
+{{ dbt_utils.group_by(8) }}
