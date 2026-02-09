@@ -280,7 +280,7 @@ END
 
 ## Resources
 
-**Tableau Public Profile:** [Your Profile Link](https://public.tableau.com/app/profile/shreyeshi.somya/vizzes)  
+**Tableau Public Profile:** [Shreyeshi Somya - Tableau](https://public.tableau.com/app/profile/shreyeshi.somya/vizzes)  
 **Phase 1 (dbt Pipeline):** [../phase1-dbt-platform/](../phase1-dbt-platform/)  
 **Dataset Source:** [Brazilian E-commerce on Kaggle](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)  
 
