@@ -2,6 +2,12 @@
 
 Interactive executive dashboards built with Tableau Public, showcasing advanced visualization techniques and business intelligence best practices.
 
+## Live Dashboard
+
+**📊 [View Interactive Dashboard on Tableau Public](https://public.tableau.com/app/profile/shreyeshi.somya/viz/ecomm-analytics/Dashboard1)**
+
+*Note: Tableau workbook files (.twbx) not included in repository due to size. Download directly from Tableau Public.*
+
 ---
 
 ## Overview
@@ -46,8 +52,6 @@ This phase transforms the analytics-ready data from Phase 1 into actionable exec
 - Conditional formatting (color-coded trends)
 - Dashboard actions
 - Professional layout & design
-
-**Published:** [Tableau Public Link](https://public.tableau.com/app/profile/shreyeshi.somya/viz/ecomm-analytics/Dashboard1)
 
 **Screenshots:** See `screenshots/dashboard1/`
 
