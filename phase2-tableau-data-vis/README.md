@@ -95,8 +95,6 @@ Published Dashboard
 ## Project Structure
 ```
 phase2-tableau-data-vis/
-├── dashboards/
-│   └── executive-overview.twbx        # Tableau packaged workbook
 ├── screenshots/
 │   ├── dashboard1/
 │   │   ├── full-dashboard.png
@@ -107,9 +105,7 @@ phase2-tableau-data-vis/
 │   │   ├── filters-applied.png
 │   │   └── cross-filtering.png
 │   ├── dashboard2/
-│   └── dashboard3/
-├── data/
-│   └── mart_order_items.csv           
+│   └── dashboard3/      
 └── README.md
 ```
 
