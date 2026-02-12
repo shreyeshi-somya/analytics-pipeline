@@ -434,7 +434,6 @@ phase2-tableau-data-vis/
 💡 **Color coding:** Used diverging palettes (green/red) for intuitive performance interpretation  
 
 ### **Future Enhancements:**
-💡 **Dashboard 3:** Customer & Product Deep Dive (RFM segmentation, cohort analysis)  
 💡 **Seller Performance:** Scorecard with weighted metrics (revenue + on-time + reviews)  
 💡 **Predictive Analytics:** Forecast delivery times based on category/state/season  
 💡 **Treemap visualization:** Payment methods with dual encoding (count + avg installments)  
