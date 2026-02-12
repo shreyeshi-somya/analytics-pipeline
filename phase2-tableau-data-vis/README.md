@@ -1,6 +1,7 @@
 # Phase 2: Tableau Data Visualization
 
 Interactive executive dashboards built with Tableau Public, showcasing advanced visualization techniques and business intelligence best practices for Brazilian e-commerce analytics.
+**Published Dashboard:** [Link](https://public.tableau.com/app/profile/shreyeshi.somya/viz/ecomm-analytics/Dashboard1)
 
 ---
 
@@ -44,8 +45,6 @@ This phase transforms analytics-ready data from Phase 1 into actionable executiv
 
 **Purpose:** High-level business performance monitoring for executive leadership
 
-**Published Dashboard:** [View on Tableau Public](#) *(Add your link)*
-
 ---
 
 ### **Features:**
@@ -83,6 +82,7 @@ This phase transforms analytics-ready data from Phase 1 into actionable executiv
 - Revenue (Delivered)
 - Orders (Delivered)
 - Number of Customers
+- Number of Items sold
 - Average Order Value
 - Review Score
 - **Effect:** Changes 4 charts simultaneously (Trend, Map, Categories, custom formatting)
@@ -139,7 +139,9 @@ This phase transforms analytics-ready data from Phase 1 into actionable executiv
 
 **Purpose:** Operational analytics for delivery optimization and performance monitoring
 
-**Navigation Structure:** Three button-controlled views within single dashboard
+**Navigation Structure:** 
+- **"<< Overview"** button (top-left) → Navigate back to Overview dashboard
+- Three button-controlled views within single dashboard
 
 ---
 
@@ -157,7 +159,7 @@ This phase transforms analytics-ready data from Phase 1 into actionable executiv
 #### **Delivery Trend (Dual-Axis with Advanced Features)**
 - **Blue line:** Average delivery days over time
 - **Orange line:** % On-Time deliveries
-- **Reference band:** Gray shaded area (10-14 days acceptable range)
+- **Reference band:** Gray shaded area (8-14 days acceptable range)
 - **Trend line:** Shows delivery time improving overall
 - **Parameter:** Date granularity switcher (Week/Month/Quarter)
 
@@ -181,6 +183,7 @@ This phase transforms analytics-ready data from Phase 1 into actionable executiv
 - **Black dots:** State-specific estimated delivery (what was promised)
 - **Red dashed line:** Company target (10 days)
 - **Color gradient:** Green (beating estimate) → Red (missing estimate)
+- **Sorting:** Ordered by avg delivery days (slowest to fastest) for easy identification of problem areas
 
 **Triple Benchmark Comparison:**
 1. **Actual vs Estimated:** Most states beat their promises ✅
@@ -192,9 +195,13 @@ This phase transforms analytics-ready data from Phase 1 into actionable executiv
 - **Tooltip with indicators:** 🟢 Beating Estimate / 🔴 Missing Estimate
 - **Dual-axis:** Bars + dots overlaid
 - **Diverging color palette:** Centered on 0 variance
+- **Interactive filters:** State multi-select and Region checkboxes for focused analysis
+- **Smart sorting:** Descending by delivery days - worst performers at top for immediate visibility
 
-**Top Performers:** São Paulo (8.6 days), Distrito Federal (12.7 days)  
-**Needs Improvement:** Amapá (28.2 days), Roraima (28.6 days) - remote northern states
+**Performance Spectrum:**
+- **Worst Performers (Top):** Roraima (28.6 days), Amapá (28.2 days), Amazonas (26.3 days) - remote northern states
+- **Best Performers (Bottom):** São Paulo (8.6 days), Paraná (11.8 days), Minas Gerais (11.9 days) - urban southeast
+- **Geographic Pattern:** Clear north-south gradient showing infrastructure/distance impact
 
 ---
 
