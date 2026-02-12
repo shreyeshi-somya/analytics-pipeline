@@ -28,6 +28,7 @@ select
     , orders.is_canceled
     , orders.order_purchase_timestamp_et
     , orders.order_delivered_customer_date_et
+    , orders.order_estimated_delivery_date_et
     , orders.is_delivered_on_time
     , orders.days_to_delivery
     , orders.delivery_speed_category

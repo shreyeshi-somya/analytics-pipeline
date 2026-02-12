@@ -26,6 +26,7 @@ select
     , is_canceled
     , order_purchase_timestamp_et
     , order_delivered_customer_date_et
+    , order_estimated_delivery_date_et
     , is_delivered_on_time
     , days_to_delivery
     , delivery_speed_category

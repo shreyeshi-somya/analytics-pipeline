@@ -35,6 +35,7 @@ select
     , fact.is_canceled
     , fact.order_purchase_timestamp_et
     , fact.order_delivered_customer_date_et
+    , fact.order_estimated_delivery_date_et
     , fact.is_delivered_on_time
     , fact.days_to_delivery
     , fact.delivery_speed_category
