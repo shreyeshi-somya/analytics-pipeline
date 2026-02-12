@@ -235,18 +235,47 @@ ECOMM_ANALYTICS (Database)
 
 ---
 
-## Phase 2: Visualization & Analytics (Tableau)
+## Phase 2: Tableau Data Visualization ✅ COMPLETE
 
-**Status:** Planned
+**Status:** Complete  
+**Dashboards:** 2 interactive dashboards with 4 navigable views  
+**Published:** [Tableau Public](https://public.tableau.com/app/profile/shreyeshi.somya/viz/ecomm-analytics/Dashboard1)
 
-Interactive dashboards and visual analytics.
+### **Deliverables:**
 
-### Planned Deliverables
-- Executive KPI dashboard
-- Delivery performance analytics
-- Customer behavior analysis
-- Product & seller performance metrics
-- Time-series analysis (weekend/peak patterns)
+**Dashboard 1: Executive Overview**
+- 5 KPI cards (Revenue, Orders, AOV, Review Score, Customers)
+- Parameter-driven analysis (6 metrics dynamically update 4 charts)
+- Monthly trend with MoM% analysis
+- Geographic performance (Brazil map with state/regional breakdown)
+- Top 10 categories (dynamic ranking)
+- Payment method distribution
+
+**Dashboard 2: Delivery Performance** (3 views)
+- **Overview:** Dual-axis delivery trend, histogram with dynamic bins, 5 operational KPIs
+- **State Deep Dive:** Bullet chart comparing actual vs estimated vs target delivery times
+- **Category Deep Dive:** LOD-based variance analysis with dual encoding (speed + volume)
+
+### **Advanced Features:**
+- LOD expressions (FIXED calculations)
+- Dual-axis charts with independent scales
+- Parameter-driven controls (metric selector, date granularity, bin size)
+- Reference bands and trend lines
+- Multi-dashboard navigation with buttons
+- Bullet charts with triple benchmarking
+- Dual encoding (size + color)
+- Dashboard actions and cross-filtering
+
+### **Key Insights Delivered:**
+- Geographic paradox: High-pop states = lower AOV
+- Delivery improvement: 14→8 days avg (2017→2018)
+- Category bottleneck: Electronics (high volume + slow delivery)
+- On-time challenge: 91.8% vs estimated, only 51.8% meet 10-day target
+
+**Tools:** Tableau Public, dbt seed files for reference data  
+**Skills:** Advanced calculations, interactive design, data storytelling, executive presentation
+
+[View Dashboards →](phase2-tableau-data-vis/)
 
 ---
 
