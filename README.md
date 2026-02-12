@@ -308,32 +308,47 @@ LLM-powered features and insights.
 
 ## Skills Demonstrated
 
-**Analytics Engineering:**
-- dbt (Data Build Tool)
-- Dimensional modeling
-- Data quality testing
-- SQL optimization
-- Cross-database SQL compatibility
+### Analytics Engineering:
+* dbt (Data Build Tool)
+* Dimensional modeling (star schema)
+* Data quality testing (30+ tests)
+* SQL optimization
+* Cross-database SQL compatibility
+* Seed files for reference data management
 
-**Data Engineering:**
-- Docker containerization
-- Python data pipelines
-- DuckDB database
-- Snowflake cloud data warehouse
-- Multi-environment deployment
-- Version control (Git)
+### Data Visualization & Business Intelligence:
+* **Tableau Public** - Advanced dashboard development
+* **LOD Expressions** - FIXED calculations for complex aggregations
+* **Parameters** - Dynamic metric selection and view switching
+* **Dual-Axis Charts** - Multiple measures with independent scales
+* **Calculated Fields** - Table calculations, conditional logic, custom formatting
+* **Interactive Design** - Dashboard actions, filters, cross-chart filtering
+* **Advanced Chart Types** - Bullet charts, dual encoding, reference bands
+* **Data Storytelling** - Executive-level insight delivery
+* **Multi-Dashboard Navigation** - Seamless UX across multiple views
 
-**Cloud & Infrastructure:**
-- Snowflake architecture and configuration
-- Environment variable management
-- Cost optimization strategies (auto-suspend, XSMALL compute)
-- Dual-target deployment (dev/prod)
+### Data Engineering:
+* Docker containerization
+* Python data pipelines
+* DuckDB database
+* Snowflake cloud data warehouse
+* Multi-environment deployment
+* Version control (Git)
 
-**Best Practices:**
-- Modular code architecture
-- Comprehensive documentation
-- Automated testing
-- Reusable components (macros, tests)
+### Cloud & Infrastructure:
+* Snowflake architecture and configuration
+* SSH key-pair authentication
+* Environment variable management
+* Cost optimization strategies (auto-suspend, XSMALL compute)
+* Dual-target deployment (dev/prod)
+
+### Best Practices:
+* Modular code architecture
+* Comprehensive documentation
+* Automated testing
+* Reusable components (macros, tests)
+* Professional dashboard design (color theory, layout, UX)
+* Executive presentation standards
 
 ---
 
