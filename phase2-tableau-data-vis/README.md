@@ -1,6 +1,6 @@
 # Phase 2: Tableau Data Visualization
 
-Interactive executive dashboards built with Tableau Public, showcasing advanced visualization techniques and business intelligence best practices for Brazilian e-commerce analytics.
+Interactive executive dashboards built with Tableau Public, showcasing advanced visualization techniques and business intelligence best practices for Brazilian e-commerce analytics.  
 **Published Dashboard:** [Link](https://public.tableau.com/app/profile/shreyeshi.somya/viz/ecomm-analytics/Dashboard1)
 
 ---
