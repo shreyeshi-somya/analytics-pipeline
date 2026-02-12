@@ -8,7 +8,7 @@ Interactive executive dashboards built with Tableau Public, showcasing advanced 
 
 This phase transforms analytics-ready data from Phase 1 into actionable executive dashboards. The project demonstrates proficiency in:
 - Advanced Tableau features (LODs, parameters, dual-axis charts)
-- Interactive dashboard design
+- Interactive dashboard design with multi-view navigation
 - Data storytelling and business insight delivery
 - Professional UI/UX for executive audiences
 
@@ -24,7 +24,23 @@ This phase transforms analytics-ready data from Phase 1 into actionable executiv
 
 ---
 
+## 📱 Dashboard Structure
+
+**Two Main Dashboards:**
+
+1. **Executive Overview** - High-level business metrics and trends
+2. **Delivery Performance** - Operational analytics with three navigable views:
+   - Deliveries Overview (default)
+   - State - Deep Dive
+   - Category - Deep Dive
+
+**Navigation:** Button-based navigation between dashboards and between delivery views
+
+---
+
 ## 📈 Dashboard 1: Executive Overview
+
+![Executive Overview](screenshots/dashboard1/overview.png)
 
 **Purpose:** High-level business performance monitoring for executive leadership
 
@@ -81,6 +97,9 @@ This phase transforms analytics-ready data from Phase 1 into actionable executiv
 - Click state on map → filters all charts
 - Automatic cross-filtering across visualizations
 
+**4. Navigation:**
+- **"Deliveries >>"** button (top-right) → Navigate to Delivery Performance dashboard
+
 ---
 
 ### **Key Insights:**
@@ -112,6 +131,7 @@ This phase transforms analytics-ready data from Phase 1 into actionable executiv
 ✅ **Custom Formatting:** Currency formatting, number abbreviations (K/M), conditional colors  
 ✅ **Geographic Mapping:** Brazil states with custom regional hierarchies  
 ✅ **Data Enrichment:** Seed files for state names, regions, category rollups  
+✅ **Dashboard Navigation:** Button-based navigation between dashboards  
 
 ---
 
@@ -119,21 +139,13 @@ This phase transforms analytics-ready data from Phase 1 into actionable executiv
 
 **Purpose:** Operational analytics for delivery optimization and performance monitoring
 
-**Published Dashboard:** [View on Tableau Public](#) *(Add your link)*
+**Navigation Structure:** Three button-controlled views within single dashboard
 
 ---
 
-### **Three-Tab Design:**
+### **View 1: Deliveries Overview** (Default)
 
-**Tab 1: Deliveries Overview**  
-**Tab 2: State - Deep Dive**  
-**Tab 3: Category - Deep Dive**
-
-*Implemented using parameter-driven view switching with overlapping floating containers*
-
----
-
-### **Tab 1: Deliveries Overview**
+![Deliveries Overview](screenshots/dashboard2/deliveries-overview.png)
 
 #### **KPI Cards (5)**
 - **Total Orders:** 95,442
@@ -158,7 +170,11 @@ This phase transforms analytics-ready data from Phase 1 into actionable executiv
 
 ---
 
-### **Tab 2: State - Deep Dive**
+### **View 2: State - Deep Dive**
+
+![State Deep Dive](screenshots/dashboard2/deliveries-state.png)
+
+*Navigate via "State - Deep Dive" button at top of dashboard*
 
 #### **State Delivery Performance (Bullet Chart)**
 - **Green bars:** Actual avg delivery days per state
@@ -182,7 +198,11 @@ This phase transforms analytics-ready data from Phase 1 into actionable executiv
 
 ---
 
-### **Tab 3: Category - Deep Dive**
+### **View 3: Category - Deep Dive**
+
+![Category Deep Dive](screenshots/dashboard2/deliveries-category.png)
+
+*Navigate via "Category - Deep Dive" button at top of dashboard*
 
 #### **Category Delivery Performance (LOD + Dual Encoding)**
 - **Bar length:** Avg delivery days by category
@@ -210,11 +230,25 @@ Variance from Overall Avg =
 
 ---
 
+### **Navigation Between Views:**
+
+**Button Implementation:**
+- **"<< Overview"** button (top-left) → Returns to Executive Overview dashboard
+- **"Deliveries Overview"** button → Shows trend + histogram view
+- **"State - Deep Dive"** button → Shows state bullet chart
+- **"Category - Deep Dive"** button → Shows category performance chart
+
+**Technical Implementation:**
+- Three separate dashboard instances with identical KPI cards
+- Navigation buttons link between dashboards
+- Maintains consistent layout and styling across views
+
+---
+
 ### **Skills Demonstrated:**
 
 ✅ **LOD Expressions (FIXED):** Calculate variance from overall average  
-✅ **Parameter-Driven View Switching:** Three tabs with show/hide logic  
-✅ **Floating Containers:** Overlapping charts for tab functionality  
+✅ **Multi-Dashboard Navigation:** Button-based view switching with consistent layout  
 ✅ **Dual-Axis Charts:** Multiple measures with different scales  
 ✅ **Reference Bands:** Shaded acceptable range zones  
 ✅ **Trend Lines:** Linear regression showing improvement trajectory  
@@ -224,6 +258,7 @@ Variance from Overall Avg =
 ✅ **Diverging Color Palettes:** Red-Green centered on zero  
 ✅ **Custom Tooltips:** Conditional indicators and formatted text  
 ✅ **Dynamic Date Granularity:** Week/Month/Quarter parameter switching  
+✅ **Dashboard Design:** Consistent branding across multiple linked views  
 
 ---
 
@@ -241,12 +276,14 @@ Variance from Overall Avg =
 - **Visual hierarchy:** Size and position indicate importance
 - **White space:** Clean, uncluttered executive-friendly design
 - **Consistent spacing:** 10px padding throughout
+- **Navigation clarity:** Prominent buttons with clear labels
 
 ### **Interactivity Strategy**
 - **Progressive disclosure:** Overview → Deep dive on demand
 - **Single-click actions:** Minimal effort for maximum insight
-- **Clear navigation:** Prominent buttons between dashboards
+- **Clear navigation:** Prominent buttons between dashboards and views
 - **Parameter controls:** Visible, accessible, intuitive
+- **Consistent experience:** Same KPIs across all delivery views
 
 ---
 
@@ -310,7 +347,7 @@ Variance from Overall Avg =
 ### **Parameters (3)**
 1. **Metric Selector:** Changes 4+ charts simultaneously
 2. **Date Granularity:** Week/Month/Quarter switching
-3. **Analysis View:** Tab navigation (Overview/State/Category)
+3. **Bin Size:** Dynamic histogram binning (1, 3, 5, 7, 10 days)
 
 ### **Calculated Fields (15+)**
 - MoM% with LOOKUP()
@@ -319,22 +356,25 @@ Variance from Overall Avg =
 - Variance calculations
 - Conditional formatting logic
 - Custom label formatting
+- Show/hide logic (attempted)
 
 ### **Chart Types (8)**
 - Dual-axis line charts
 - Bullet charts
-- Histograms
+- Histograms with dynamic bins
 - Horizontal bar charts
 - Choropleth maps
-- KPI cards
+- KPI cards (Big Ass Numbers)
 - Combination charts (bar + circle dual encoding)
+- Reference bands and trend lines
 
 ### **Interactive Features**
 - Dashboard actions (filter on click)
 - Parameter controls (dropdowns, sliders)
-- Show/hide logic (floating container swapping)
-- Cross-dashboard navigation (buttons)
+- Multi-dashboard navigation (buttons)
+- Cross-dashboard navigation
 - Hierarchical filters (Region → State)
+- Automatic cross-filtering
 
 ---
 
@@ -359,11 +399,7 @@ phase2-tableau-data-vis/
 
 ## 🔗 Live Dashboards
 
-**📊 Dashboard 1: Executive Overview**  
-[View on Tableau Public](#) *(Add link)*
-
-**🚚 Dashboard 2: Delivery Performance**  
-[View on Tableau Public](#) *(Add link)*
+**📊 Dashboard: [View on Tableau Public](https://public.tableau.com/app/profile/shreyeshi.somya/viz/ecomm-analytics/Dashboard1)**
 
 ---
 
@@ -374,19 +410,27 @@ phase2-tableau-data-vis/
 ✅ **LOD expressions:** Enabled complex comparisons (actual vs avg) without data prep  
 ✅ **Dual encoding:** Conveyed two metrics simultaneously (size + color)  
 ✅ **Seed file integration:** Reference data in dbt = clean, maintainable analytics  
-✅ **Floating containers:** Achieved tab-like functionality without complex workarounds  
+✅ **Multi-dashboard navigation:** Button-based approach simpler and more maintainable than floating containers  
+✅ **Consistent KPI layout:** Same metrics across all delivery views reduces cognitive load  
 
 ### **Challenges Overcome:**
 ⚠️ **Tableau Public limitations:** No live Snowflake connection (CSV export required)  
 ⚠️ **Reference lines on dynamic charts:** Don't work well with parameter-driven date granularity  
-⚠️ **Overlapping charts:** Floating positioning can be finicky for exact alignment  
-⚠️ **Tab-like interface:** Native tabs don't exist, required creative parameter + filter logic  
+⚠️ **Multi-view implementation:** Chose separate dashboards with navigation buttons over complex parameter show/hide logic - cleaner and more maintainable  
+⚠️ **Geographic recognition:** Brazil states required explicit country field to avoid US mapping  
+
+### **Design Decisions:**
+💡 **Separate dashboards vs tabs:** Chose button navigation between dashboards for cleaner implementation and better performance  
+💡 **Fixed vs dynamic targets:** Used LOD to calculate state-specific targets instead of fixed 10-day benchmark  
+💡 **Dual encoding:** Prioritized information density over simplicity for analytical deep-dive views  
+💡 **Color coding:** Used diverging palettes (green/red) for intuitive performance interpretation  
 
 ### **Future Enhancements:**
 💡 **Dashboard 3:** Customer & Product Deep Dive (RFM segmentation, cohort analysis)  
 💡 **Seller Performance:** Scorecard with weighted metrics (revenue + on-time + reviews)  
 💡 **Predictive Analytics:** Forecast delivery times based on category/state/season  
-💡 **Mobile Responsive:** Optimize layouts for tablet/phone viewing  
+💡 **Treemap visualization:** Payment methods with dual encoding (count + avg installments)  
+💡 **Waterfall chart:** Revenue composition (product + freight breakdown)  
 
 ---
 
@@ -396,33 +440,23 @@ This project demonstrates mastery of:
 
 **Tableau Expertise:**
 - Advanced calculated fields (LODs, table calculations, parameters)
-- Interactive dashboard design (actions, filters, navigation)
+- Interactive dashboard design (actions, filters, multi-dashboard navigation)
 - Data storytelling (insight delivery, visual hierarchy)
 - Professional formatting (color theory, typography, layout)
+- Complex visualizations (bullet charts, dual-axis, dual encoding)
 
 **Business Intelligence:**
 - KPI selection and monitoring
 - Trend analysis and forecasting
 - Segmentation and comparative analysis
 - Operational metrics vs strategic goals
+- Multi-level analysis (overview → deep dive)
 
-**Data Engineering Integration:**
-- dbt seed files for reference data
-- Snowflake cloud warehouse connection
-- Data quality and filtering decisions
-- Cross-phase data pipeline consistency
-
----
-
-## 👤 Author
-
-**Shreyeshi Somya**  
-MS Business Analytics (UCLA) | BS Computer Science (VIT Vellore)  
-Enterprise Analytics @ Peloton
-
-**Portfolio:** [Your Website](#)  
-**LinkedIn:** [Your Profile](#)  
-**GitHub:** [analytics-pipeline](https://github.com/yourusername/analytics-pipeline)  
+**UX/UI Design:**
+- Multi-dashboard navigation architecture
+- Consistent branding and layout
+- Progressive disclosure patterns
+- Executive-friendly presentation
 
 ---
 
@@ -430,9 +464,15 @@ Enterprise Analytics @ Peloton
 
 **Phase 1 (dbt Pipeline):** [../phase1-dbt-platform/](../phase1-dbt-platform/)  
 **Dataset Source:** [Brazilian E-commerce on Kaggle](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)  
-**Tableau Public Profile:** [Your Profile](#)  
+**Tableau Public Profile:** [Tableau Profile](https://public.tableau.com/app/profile/shreyeshi.somya/vizzes)  
 
 ---
 
-*Phase 2 Complete | Dashboards 1 & 2 Published*  
+## 👤 Author
+
+**Shreyeshi Somya**  
+
+---
+
+*Phase 2 Complete | 2 Dashboards with 4 Interactive Views*  
 *Last Updated: February 2026*
