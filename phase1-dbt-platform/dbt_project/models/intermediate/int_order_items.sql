@@ -39,8 +39,14 @@ select
     , orders.review_score
     , orders.review_sentiment
     , orders.has_review
+    , orders.days_to_review
+    , orders.is_quick_review
+    , orders.is_payment_details_missing
     , orders.total_payment_value
     , orders.total_payment_installments
+    , orders.first_payment_type
+    , orders.primary_payment_type
+    , orders.primary_payment_category
 
     -- Product attributes
     , product.product_name_length

@@ -46,8 +46,14 @@ select
     , fact.review_score
     , fact.review_sentiment
     , fact.has_review
+    , fact.days_to_review
+    , fact.is_quick_review
+    , fact.is_payment_details_missing
     , fact.total_payment_value
     , fact.total_payment_installments
+    , fact.first_payment_type
+    , fact.primary_payment_type
+    , fact.primary_payment_category
     , fact.revenue_delivered
     , fact.product_price_delivered
     , fact.freight_delivered

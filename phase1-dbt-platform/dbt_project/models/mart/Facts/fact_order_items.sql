@@ -37,8 +37,14 @@ select
     , review_score
     , review_sentiment
     , has_review
+    , days_to_review
+    , is_quick_review
+    , is_payment_details_missing
     , total_payment_value
     , total_payment_installments
+    , first_payment_type
+    , primary_payment_type
+    , primary_payment_category
 
     , case when is_delivered then total_item_value else 0 end as revenue_delivered
     , case when is_delivered then price else 0 end as product_price_delivered
