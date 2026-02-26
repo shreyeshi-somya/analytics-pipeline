@@ -46,3 +46,4 @@ phase1-dbt-platform/dbt_project/dbt_packages/
 phase1-dbt-platform/.env
 .csv
 *.duckdb.locked
+.ipynb_checkpoints/
