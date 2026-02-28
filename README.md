@@ -13,7 +13,7 @@ This project demonstrates end-to-end analytics capabilities from data ingestion 
 - **Phase 1: dbt Analytics Platform (DuckDB)** ✅ *Complete*
    - **Phase 1.5: Cloud Migration (Snowflake)** ✅ *Complete*
 - **Phase 2: Visualization & Analytics (Tableau)** ✅ *Complete*
-- Phase 3: Data Science & ML
+- **Phase 3: Data Science & ML** ✅ *Complete*
 - Phase 4: Applied AI (LLM Insights)
 - Phase 5: Integration & Polish
 
@@ -279,17 +279,59 @@ ECOMM_ANALYTICS (Database)
 
 ---
 
-## Phase 3: Data Science & ML
+## Phase 3: Data Science & ML ✅
 
-**Status:** Planned
+**Status:** Complete
 
-Machine learning models for predictive analytics.
+Exploratory data analysis and machine learning on the Olist dataset, using the clean dbt marts from Phase 1.
 
-### Planned Models
-- Customer churn prediction
-- Delivery time estimation
-- Product recommendation engine
-- Review sentiment analysis
+### Tech Stack
+- **ML:** Scikit-learn, XGBoost, LightGBM, SHAP
+- **Data:** Pandas, NumPy, DuckDB
+- **Visualization:** Matplotlib, Seaborn
+- **Environment:** Docker, Jupyter Notebook
+
+### Notebooks
+
+**1. EDA (01_eda.ipynb)** — Comprehensive analysis across growth trends, geography, delivery performance, seller concentration, product categories, and payment behavior.
+
+Key findings:
+- Order growth plateaued at ~7K/month after Nov 2017. AOV stable ~R\$160
+- São Paulo = 42% of orders. Southeast region = 69%. North region averages 1.5x longer delivery
+- 92.1% on-time delivery rate, median 10 days
+- 19% of sellers drive 80% of revenue. 97% of customers are one-time buyers
+
+**2. Seller Segmentation (02_seller_segmentation.ipynb)** — K-Means clustering on 2,970 sellers using 8 features across volume, business type, and quality dimensions.
+
+Four segments identified:
+
+| Segment | Sellers | Revenue | Avg Review | On-Time |
+|---------|---------|---------|------------|---------|
+| Small & Reliable | 1,206 (41%) | 2.7% | 4.38 | 97% |
+| Top Performers | 763 (26%) | 79.1% | 4.15 | 92% |
+| Mid-Tier | 876 (29%) | 17.6% | 4.14 | 92% |
+| Underperformers | 125 (4%) | 0.7% | 2.66 | 29% |
+
+Key insight: Mid-Tier sellers already match Top Performers on quality — the gap is purely in scale and catalog size, making them strong candidates for growth programs.
+
+**3. Delivery Prediction (03_delivery_prediction.ipynb)** — XGBoost regression predicting actual delivery time using 22 engineered features (geography, product attributes, seller profile, temporal signals).
+
+| Model | MAE (days) | R² |
+|-------|-----------|-----|
+| Naive (predict median) | 4.91 | -0.155 |
+| Random Forest | 3.54 | 0.164 |
+| **XGBoost (tuned)** | **3.44** | **0.232** |
+
+- 79.4% of predictions within 5 days of actual delivery
+- Distance is the dominant driver (33% importance via SHAP), followed by temporal trend and region
+- Outperforms Olist's existing estimates by 4x (MAE 3.44 vs 13.22 days)
+
+### Deliverables
+- 22 analysis and model visualizations
+- `seller_clusters.csv` — cluster assignments for 2,970 sellers
+- `delivery_predictions.csv` — model predictions for test set orders
+
+**[View Phase 3 detailed documentation →](phase3-data-science/README.md)**
 
 ---
 
@@ -315,6 +357,14 @@ LLM-powered features and insights.
 * SQL optimization
 * Cross-database SQL compatibility
 * Seed files for reference data management
+
+### Data Science & Machine Learning:
+* **Exploratory Data Analysis** - Multi-dimensional analysis with actionable findings
+* **K-Means Clustering** - Unsupervised segmentation with log transforms, elbow/silhouette evaluation
+* **XGBoost Regression** - Gradient boosting with hyperparameter tuning (RandomizedSearchCV)
+* **Feature Engineering** - Haversine distance, temporal trends, holiday proximity, freight ratios
+* **Model Interpretability** - SHAP values, partial dependence plots, feature importance analysis
+* **Experiment Design** - Segmented modeling, correlated feature analysis, baseline comparison
 
 ### Data Visualization & Business Intelligence:
 * **Tableau Public** - Advanced dashboard development
