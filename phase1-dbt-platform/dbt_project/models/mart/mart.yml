@@ -505,3 +505,5 @@ models:
         description: Unique customer identifier across all orders
         tests:
           - not_null
+      - name: cluster_name
+        description: Seller segment from Phase 3 K-Means clustering (Small & Reliable, Top Performers, Mid-Tier, Underperformers)

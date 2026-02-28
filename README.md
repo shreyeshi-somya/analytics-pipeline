@@ -41,21 +41,27 @@ Built a production-grade data transformation pipeline using dbt, DuckDB, and Doc
 
 ### Project Structure
 ```
-phase1-dbt-platform/
-├── dbt_project/
-│   ├── models/
-│   │   ├── staging/        # Clean, typed data from sources (9 models)
-│   │   ├── intermediate/   # Business logic & transformations (9 models)
-│   │   └── marts/          # Final analytical models (6 models)
-│   ├── macros/             # Custom reusable SQL functions (3 macros)
-│   ├── tests/              # Data quality tests (30+ tests)
-│   └── seeds/              # Reference data (3 seed files)
+analytics-pipeline/
+├── docker-compose.yml          # Centralized orchestration for all phases
 ├── data/
-│   └── raw/               # Source CSV files (not committed)
-├── scripts/
-│   └── load_data.py       # Data ingestion script
-├── Dockerfile
-└── docker-compose.yml
+│   └── analytics.duckdb        # Shared DuckDB database across phases
+├── phase1-dbt-platform/
+│   ├── Dockerfile
+│   ├── dbt_project/
+│   │   ├── models/
+│   │   │   ├── staging/        # Clean, typed data from sources (9 models)
+│   │   │   ├── intermediate/   # Business logic & transformations (9 models)
+│   │   │   └── marts/          # Final analytical models (6 models)
+│   │   ├── macros/             # Custom reusable SQL functions (3 macros)
+│   │   ├── tests/              # Data quality tests (30+ tests)
+│   │   └── seeds/              # Reference data (3 seed files)
+│   ├── data/
+│   │   └── raw/               # Source CSV files (not committed)
+│   └── scripts/
+│       └── load_data.py       # Data ingestion script
+└── phase3-data-science/
+    ├── Dockerfile
+    └── notebooks/              # Jupyter notebooks (EDA, ML)
 ```
 
 ### Key Features
@@ -107,7 +113,7 @@ phase1-dbt-platform/
 - `dim_sellers` - Seller performance, ratings, and geographic region
 - `fact_order` - Order-level transactions with delivery tracking, holiday flags, and customer region
 - `fact_order_items` - Item-level details with product broad category, seller/customer regions, and shipping logistics
-- `mart_order_items` - Wide denormalized table pre-joined with all dimensions for BI tool performance
+- `mart_order_items` - Wide denormalized table pre-joined with all dimensions and ML-derived seller cluster labels for BI tool performance
 
 ### Highlights
 
@@ -136,35 +142,22 @@ phase1-dbt-platform/
 - Git
 - (Optional) Snowflake account for cloud deployment
 
-**Setup - Local Development (DuckDB):**
+**Setup:**
 ```bash
 # Clone the repository
 git clone https://github.com/shreyeshi-somya/analytics-pipeline.git
-cd analytics-pipeline/phase1-dbt-platform
+cd analytics-pipeline
 
-# Start the environment
+# Start all services (dbt + Jupyter) from root
 docker compose build
 docker compose up -d
 
-# Enter the container
+# Enter the dbt container
 docker compose exec dbt bash
 
-# Load data
+# Load data & run pipeline
 python /app/scripts/load_data.py
-
-# Run dbt pipeline
-dbt seed              # Load seed data (holidays, category rollup, states)
-dbt run               # Build all models
-dbt test              # Run all tests
-dbt docs generate     # Generate documentation
-```
-
-**Setup - Cloud Production (Snowflake):**
-```bash
-# Deploy to Snowflake
-dbt seed --target snowflake
-dbt run --target snowflake
-dbt test --target snowflake
+dbt seed && dbt run && dbt test
 ```
 
 ### Phase 1 Deliverables ✅
@@ -328,8 +321,9 @@ Key insight: Mid-Tier sellers already match Top Performers on quality — the ga
 
 ### Deliverables
 - 22 analysis and model visualizations
-- `seller_clusters.csv` — cluster assignments for 2,970 sellers
-- `delivery_predictions.csv` — model predictions for test set orders
+- `ml_outputs.seller_clusters` — cluster assignments for 2,970 sellers (stored in shared DuckDB)
+- `ml_outputs.delivery_predictions` — model predictions for test set orders (stored in shared DuckDB)
+- Seller cluster labels integrated into dbt `mart_order_items` via source join
 
 **[View Phase 3 detailed documentation →](phase3-data-science/README.md)**
 
@@ -378,9 +372,9 @@ LLM-powered features and insights.
 * **Multi-Dashboard Navigation** - Seamless UX across multiple views
 
 ### Data Engineering:
-* Docker containerization
+* Docker containerization (centralized multi-service orchestration)
+* Shared DuckDB database across phases (ML outputs → dbt sources)
 * Python data pipelines
-* DuckDB database
 * Snowflake cloud data warehouse
 * Multi-environment deployment
 * Version control (Git)

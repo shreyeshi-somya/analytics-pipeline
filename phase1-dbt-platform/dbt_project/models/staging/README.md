@@ -196,8 +196,16 @@ sources:
     tables:
       - name: orders
       - name: customers
-      # ... etc
+      # ... (9 tables total)
+
+  - name: ml_outputs
+    schema: ml_outputs
+    tables:
+      - name: seller_clusters      # K-Means segmentation from Phase 3
+      - name: delivery_predictions  # XGBoost predictions from Phase 3
 ```
+
+The `raw` sources are used by staging models. The `ml_outputs` sources are consumed directly by the mart layer (`mart_order_items` joins `seller_clusters` to enrich order items with seller segment labels). These tables are written to the shared DuckDB database by the Phase 3 data science notebooks.
 
 Additionally, 3 seed files are used to enrich staging models:
 - `product_category_rollup`

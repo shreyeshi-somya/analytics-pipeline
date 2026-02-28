@@ -9,13 +9,15 @@ Exploratory data analysis and machine learning models built on the Olist Brazili
 - Date range: Sep 2016 – Aug 2018
 - Total revenue: R\$15.4M
 
+## Infrastructure
+
+This phase runs as the `data-science` service in the root `docker-compose.yml`. It shares a DuckDB database (`data/analytics.duckdb`) with the dbt service, enabling ML outputs to flow directly into the dbt pipeline without intermediate CSV files.
+
 ## Folder Structure
 ```
 phase3-data-science/
 ├── Dockerfile
-├── docker-compose.yml
 ├── requirements.txt
-├── analytics.duckdb
 ├── notebooks/
 │   ├── 01_eda.ipynb
 │   ├── 02_seller_segmentation.ipynb
@@ -23,9 +25,7 @@ phase3-data-science/
 ├── outputs/
 │   ├── 01–07: EDA visualizations
 │   ├── 08–12: Seller segmentation charts
-│   ├── 13–22: Delivery prediction analysis
-│   ├── seller_clusters.csv
-│   └── delivery_predictions.csv
+│   └── 13–22: Delivery prediction analysis
 └── README.md
 ```
 
@@ -89,7 +89,8 @@ K-Means clustering on 2,970 sellers using 8 features across three dimensions: vo
 | `10_cluster_profiles_log.png` | Normalized feature profiles per cluster |
 | `11_pca_clusters.png` | PCA projection (PC1=scale 34.9%, PC2=quality 24.3%) |
 | `12_cluster_gap_analysis.png` | Mid-Tier vs Top Performers gap analysis |
-| `seller_clusters.csv` | Cluster assignments for all 2,970 sellers |
+
+Results are written to the shared DuckDB database as `ml_outputs.seller_clusters` (seller_id, cluster, cluster_name), which is consumed by the dbt mart layer in `mart_order_items` to enrich order items with seller segment labels.
 
 ---
 
@@ -158,12 +159,16 @@ Olist systematically overestimates by ~12.7 days (intentional "under-promise, ov
 | `20_partial_dependence.png` | Partial dependence for top 5 features |
 | `21_error_analysis.png` | Actual vs predicted, error distribution, MAE by segment |
 | `22_olist_vs_model.png` | Side-by-side comparison with Olist estimates |
-| `delivery_predictions.csv` | Predictions for all test set orders |
+
+Results are written to the shared DuckDB database as `ml_outputs.delivery_predictions` (order_id, days_to_delivery, predicted, error, abs_error).
 
 ---
 
-## Next Steps
-- **Pipeline Integration:** Push cluster labels and delivery predictions back into dbt as seed files for downstream visualization in Tableau
+## Pipeline Integration
+
+ML outputs are written directly to the shared DuckDB database (`ml_outputs` schema) and consumed by the dbt project as sources:
+- **Seller clusters** → joined into `mart_order_items` via `source('ml_outputs', 'seller_clusters')`, adding `cluster_name` to every order item row
+- **Delivery predictions** → available in `ml_outputs.delivery_predictions` for future downstream use
 
 ## Tech Stack
 Python, Pandas, NumPy, Scikit-learn, XGBoost, LightGBM, SHAP, Matplotlib, Seaborn, DuckDB, Docker, Jupyter

@@ -14,8 +14,9 @@ This phase implements a comprehensive dbt project that transforms raw Brazilian 
 - **Data quality framework** with 30+ tests
 - **Custom macros** for reusable business logic
 - **Dimensional modeling** with fact and dimension tables
-- **Dockerized environment** for reproducibility
+- **Dockerized environment** for reproducibility (centralized Docker Compose at project root)
 - **Dual-target deployment** (DuckDB + Snowflake)
+- **ML output integration** (seller clusters from Phase 3 joined into mart layer)
 
 ---
 
@@ -116,8 +117,8 @@ Organized by transformation layer with clear separation of concerns.
 
 **Facts**
 - `fact_orders` - Order fact table with comprehensive metrics
-- `fact_order_items` - Order line item fact table (wide denormalized)  
-- `mart_order_item` - Wide denormalized fact table pre-joined with all dimensions for BI tool performance
+- `fact_order_items` - Order line item fact table (wide denormalized)
+- `mart_order_items` - Wide denormalized fact table pre-joined with all dimensions and ML-derived seller cluster labels for BI tool performance
 
 
 ---
@@ -264,6 +265,10 @@ Comprehensive order line item table with:
 - Sellers (3k rows)
 - Geolocation (1M rows)
 
+**ML Output Tables** (from Phase 3, stored in shared DuckDB):
+- `ml_outputs.seller_clusters` - K-Means cluster assignments for 2,970 sellers
+- `ml_outputs.delivery_predictions` - XGBoost delivery time predictions
+
 ---
 
 ## Additional Features
@@ -309,16 +314,19 @@ Comprehensive order line item table with:
 ```
 
 ### Setup - Local Development (DuckDB)
+
+Docker Compose is centralized at the project root (`analytics-pipeline/docker-compose.yml`) and orchestrates both the dbt and data science containers with a shared DuckDB database mounted at `./data/analytics.duckdb`.
+
 ```bash
 # Clone repository
 git clone https://github.com/shreyeshi-somya/analytics-pipeline.git
-cd analytics-pipeline/phase1-dbt-platform
+cd analytics-pipeline
 
-# Start Docker environment
+# Start all services from root
 docker compose build
 docker compose up -d
 
-# Enter container
+# Enter the dbt container
 docker compose exec dbt bash
 
 # Load data
@@ -328,7 +336,6 @@ python /app/scripts/load_data.py
 dbt seed              # Load seed data (holidays, category rollup, states)
 dbt run               # Build all models
 dbt test              # Run all tests
-dbt build             # Run and test all models  
 dbt docs generate     # Generate documentation
 ```
 
@@ -433,6 +440,7 @@ This dual-target approach enables:
 - **Custom Macros:** 3 (timezone conversion, schema naming, data validation)
 - **Custom Tests:** 3 (non_negative_values, error_excessive_canceled_with_delivery, warn_canceled_orders_with_delivery)
 - **Seed Files:** 3 (brazilian_holidays, product_category_rollup, brazil_states_with_regions)
+- **External Sources:** 2 ML output tables (seller_clusters, delivery_predictions from Phase 3)
 - **Deployment Targets:** 2 (DuckDB, Snowflake)
 - **Lines of SQL:** 1,500+
 

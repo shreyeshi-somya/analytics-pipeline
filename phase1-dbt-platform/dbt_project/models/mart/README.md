@@ -45,7 +45,7 @@ models/mart/
 
 | Model | Grain | Source | Description |
 |-------|-------|--------|-------------|
-| `mart_order_items` | One row per order line item | `fact_order_items` + all dimensions | Wide table joining fact with dim_customers, dim_sellers, and dim_products for Data Visualization tool |
+| `mart_order_items` | One row per order line item | `fact_order_items` + all dimensions + ML outputs | Wide table joining fact with dim_customers, dim_sellers, dim_products, and ML-derived seller cluster labels for Data Visualization tool |
 
 ## Model Details
 
@@ -116,14 +116,15 @@ Selects columns from `int_order_items` as a pass-through to the mart layer, incl
 
 ### mart_order_items
 
-Denormalized wide table purpose-built for the Data Visualization tool. Joins `fact_order_items` with all three dimensions so analysts can slice and dice without writing joins.
+Denormalized wide table purpose-built for the Data Visualization tool. Joins `fact_order_items` with all three dimensions and ML output tables so analysts can slice and dice without writing joins.
 
-**Sources:** `fact_order_items`, `dim_customers`, `dim_sellers`, `dim_products`
+**Sources:** `fact_order_items`, `dim_customers`, `dim_sellers`, `dim_products`, `ml_outputs.seller_clusters`
 
 **Joins:**
 - `dim_customers` on `customer_unique_id` — adds customer lifetime metrics, `customer_dim_state_name`, `customer_dim_region`
 - `dim_sellers` on `seller_id` — adds seller performance metrics, `seller_dim_state_name`, `seller_dim_region`
 - `dim_products` on `product_id` — adds product sales metrics, `product_broad_category`
+- `ml_outputs.seller_clusters` on `seller_id` — adds `cluster_name` from Phase 3 K-Means segmentation (Small & Reliable, Top Performers, Mid-Tier, Underperformers)
 
 All dimension columns are prefixed with `customer_`, `seller_`, or `product_` to avoid ambiguity. Fact-level geographic columns (e.g., `customer_state_name`, `seller_region`) represent the transactional context, while dimension-prefixed columns (e.g., `customer_dim_state_name`, `seller_dim_region`) come from the aggregated dimension tables.
 
@@ -146,6 +147,8 @@ int_order_items ────┬────────────┤          
                     │            │                            │
                     ▼            │                            ▼
               fact_order_items ──┴──────────────────▶ mart_order_items
+                                                              ▲
+              ml_outputs.seller_clusters ──────────────────────┘
 ```
 
 ## Materialization
@@ -176,13 +179,20 @@ All mart models are materialized as **tables**:
 - Boolean fields: `is_`, `has_`, `used_` prefix
 - Rates and ratios suffixed descriptively: `cancellation_rate`, `on_time_delivery_rate`
 
-## Seed Data Dependencies
+## External Dependencies
 
+### Seed Data
 The mart layer benefits from 3 seed files that flow through the upstream layers:
 
 - **`brazilian_holidays`** - Joined directly in `fact_order` to flag holiday purchases
 - **`product_category_rollup`** - Provides `broad_category` via staging → intermediate → marts (dim_products, fact_order_items, mart_order_items)
 - **`brazil_states_with_regions`** - Provides state names and geographic regions via staging → intermediate → marts (dim_customers, dim_sellers, fact_order, fact_order_items, mart_order_items)
+
+### ML Outputs (Phase 3)
+The mart layer also consumes ML output tables written to the shared DuckDB database by Phase 3 data science notebooks:
+
+- **`ml_outputs.seller_clusters`** - K-Means cluster assignments (seller_id, cluster, cluster_name) joined in `mart_order_items` to add seller segment labels
+- **`ml_outputs.delivery_predictions`** - XGBoost delivery time predictions (available for future integration)
 
 ## Downstream Usage
 
