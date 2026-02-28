@@ -157,7 +157,11 @@ select
     , dim_prod.first_sale_date as product_first_sale_date
     , dim_prod.last_sale_date as product_last_sale_date
 
+    -- Seller Clusters 
+    , sc.cluster_name
+
 from {{ ref('fact_order_items') }} fact
 left join {{ ref('dim_customers') }} dim_cust on fact.customer_unique_id = dim_cust.customer_unique_id
 left join {{ ref('dim_sellers') }} dim_sell on fact.seller_id = dim_sell.seller_id
 left join {{ ref('dim_products') }} dim_prod on fact.product_id = dim_prod.product_id
+left join {{ source('ml_outputs', 'seller_clusters') }} sc on fact.seller_id = sc.seller_id

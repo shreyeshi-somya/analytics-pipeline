@@ -31,3 +31,11 @@ sources:
         
       - name: product_category_name
         description: Translation of product categories PT->EN
+  
+  - name: ml_outputs
+    schema: ml_outputs
+    tables:
+      - name: seller_clusters
+        description: "Seller cluster assignments from K-Means segmentation"
+      - name: delivery_predictions
+        description: "XGBoost delivery time predictions on test set"

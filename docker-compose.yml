@@ -1,0 +1,24 @@
+version: '3'
+services:
+  dbt:
+    build: ./phase1-dbt-platform
+    env_file:
+      - ./phase1-dbt-platform/.env
+    volumes:
+      - ./data:/app/data
+      - ./phase1-dbt-platform/dbt_project:/app/dbt_project
+      - ./phase1-dbt-platform/scripts:/app/scripts
+      - ./phase1-dbt-platform/data:/app/raw_data
+      - ~/.ssh/snowflake_key:/root/.ssh/snowflake_key:ro
+
+  data-science:
+    build: ./phase3-data-science
+    volumes:
+      - ./data:/app/data
+      - ./phase3-data-science/notebooks:/app/notebooks
+      - ./phase3-data-science/outputs:/app/outputs
+    ports:
+      - "8888:8888"
+    shm_size: '2g'
+
+volumes: {}

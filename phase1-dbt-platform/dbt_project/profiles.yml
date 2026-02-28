@@ -1,9 +1,9 @@
 ecomm:
-  target: duckdb  # Default to DuckDB
+  target: duckdb
   outputs:
     duckdb:
       type: duckdb
-      path: /app/duckdb/analytics.duckdb
+      path: /app/data/analytics.duckdb
       threads: 4
       extensions:
         - parquet
