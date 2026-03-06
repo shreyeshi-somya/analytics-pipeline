@@ -14,7 +14,7 @@ This project demonstrates end-to-end analytics capabilities from data ingestion 
    - **Phase 1.5: Cloud Migration (Snowflake)** ✅ *Complete*
 - **Phase 2: Visualization & Analytics (Tableau)** ✅ *Complete*
 - **Phase 3: Data Science & ML** ✅ *Complete*
-- Phase 4: Applied AI (LLM Insights)
+- **Phase 4: Applied AI — NLP Sentiment Analysis** 🔄 *In Progress*
 - Phase 5: Integration & Polish
 
 ---
@@ -329,16 +329,52 @@ Key insight: Mid-Tier sellers already match Top Performers on quality — the ga
 
 ---
 
-## Phase 4: Applied AI (LLM Insights)
+## Phase 4: Applied AI — NLP Sentiment Analysis
 
-**Status:** Planned
+**Status:** In Progress
 
-LLM-powered features and insights.
+AI-powered review translation and sentiment analysis on the Olist dataset. Reviews are originally in Portuguese — translated to English using Claude (Anthropic's LLM), then evaluated across multiple sentiment analysis approaches.
 
-### Planned Features
-- Review translation (Portuguese → English)
-- Automated insight generation
-- Natural language query interface
+### Tech Stack
+- **LLM:** Anthropic Claude API (Haiku) — translation + sentiment classification
+- **NLP:** NLTK, VADER, Gensim (Word2Vec), GloVe
+- **ML:** Scikit-learn (TF-IDF + classifiers), TensorFlow/Keras (LSTM)
+- **Data:** Pandas, DuckDB, Plotly
+- **Environment:** Docker, Jupyter Notebook
+
+### Translation Pipeline (Complete)
+
+Two-tier Portuguese → English translation of ~40K review messages and ~11K titles:
+- **Dictionary lookup** for short reviews (<10 chars) using a curated mapping (2,507 mapped)
+- **Claude Haiku Batch API** for longer reviews — 49,651 requests processed asynchronously at 50% cost
+- Final dataset: **98,410** reviews with **40,209** translated messages and **11,174** translated titles
+
+### Sentiment Analysis
+
+Multi-model comparison on translated reviews:
+
+| Model | Accuracy | F1 Macro |
+|-------|----------|----------|
+| TF-IDF + Logistic Regression | 69.24% | 0.3679 |
+| **TF-IDF + LinearSVC (balanced, tuned)** | **67.67%** | **0.4294** |
+| Word2Vec + LinearSVC (balanced) | 66.93% | 0.4218 |
+| GloVe + LinearSVC (balanced) | 63.59% | 0.3935 |
+| LSTM | 51.41% | — |
+| Claude LLM (small sample) | ~75%+ | — |
+
+Key findings:
+- VADER struggles with factual complaints — 36% neutral rate on 1-2 star reviews
+- TF-IDF + LinearSVC (balanced) is the best traditional ML approach
+- GloVe underperforms domain-trained Word2Vec due to Wikipedia/news domain mismatch
+- LSTM fails on short reviews with severe class imbalance
+- Claude LLM outperforms all traditional approaches on a small sample evaluation — full-scale batch sentiment analysis in progress
+
+### Deliverables
+- `llm_outputs.translated_reviews` — Batch API translations (39,946 reviews)
+- `llm_outputs.review_translations_final` — Combined translations from all sources (98,410 reviews)
+- `llm_outputs.review_sentiments` — Claude sentiment classifications (in progress)
+
+**[View Phase 4 detailed documentation →](phase4-llm/README.md)**
 
 ---
 
@@ -359,6 +395,14 @@ LLM-powered features and insights.
 * **Feature Engineering** - Haversine distance, temporal trends, holiday proximity, freight ratios
 * **Model Interpretability** - SHAP values, partial dependence plots, feature importance analysis
 * **Experiment Design** - Segmented modeling, correlated feature analysis, baseline comparison
+
+### NLP & Applied AI:
+* **LLM APIs** - Anthropic Claude (Haiku) for translation and sentiment classification
+* **Batch API Processing** - Asynchronous large-scale LLM inference at reduced cost
+* **Sentiment Analysis** - Multi-model comparison (VADER, TF-IDF classifiers, Word2Vec, GloVe, LSTM, LLM)
+* **Text Pre-processing** - Tokenization, lemmatization, stopword removal, TF-IDF vectorization
+* **Word Embeddings** - Domain-trained Word2Vec vs pretrained GloVe comparison
+* **Deep Learning** - LSTM sequence models with class weight balancing
 
 ### Data Visualization & Business Intelligence:
 * **Tableau Public** - Advanced dashboard development

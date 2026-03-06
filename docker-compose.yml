@@ -21,4 +21,16 @@ services:
       - "8888:8888"
     shm_size: '2g'
 
+  llm-app:
+    build: ./phase4-llm
+    env_file:
+      - ./phase4-llm/.env
+    volumes:
+      - ./data:/app/data
+      - ./phase4-llm/app:/app
+    ports:
+      - "8501:8501"
+      - "8888:8888"
+    shm_size: '2g'
+
 volumes: {}

@@ -48,4 +48,7 @@ phase1-dbt-platform/.env
 *.duckdb.locked
 .ipynb_checkpoints/
 .Trash-0/
-logs/
+logs/data/
+/data/
+/data/*
+logs/*
