@@ -31,6 +31,10 @@ phase4-llm/
 │   ├── 07_retrieve_sentiment_batch.ipynb  # LLM sentiment batch retrieval
 │   ├── short_review_lookup.csv            # Portuguese→English dictionary for short reviews
 │   └── download_models.py                 # GloVe + NLTK data downloader
+├── screenshots/
+│   ├── model_performance.png              # Full results table
+│   ├── accuracy_chart.png                 # Accuracy comparison bar chart
+│   └── f1_score_chart.png                 # F1 Macro comparison bar chart
 └── README.md
 ```
 
@@ -79,11 +83,11 @@ Merges all translation sources into a single enriched dataset.
 
 ### Part 2: Sentiment Analysis (Notebooks 05–07)
 
-Multi-model sentiment analysis comparing VADER, TF-IDF classifiers, Word2Vec, GloVe, LSTM, and Claude LLM.
+Multi-model sentiment analysis comparing VADER, TF-IDF classifiers, Word2Vec, GloVe, LSTM, and Claude LLM across **41,940** reviews.
 
 #### 05 — Sentiment Analysis (`05_sentiment_analysis.ipynb`)
 
-Core analysis notebook. Loads translated reviews from `llm_outputs.review_translations_final` and evaluates six modeling approaches.
+Core analysis notebook. Loads translated reviews from `llm_outputs.review_translations_final` and evaluates six modeling approaches across three paradigms — lexicon-based, classical ML, and LLM-based.
 
 **Text Pre-processing:**
 - Filtered to reviews with at least one translated field (message or title)
@@ -91,46 +95,73 @@ Core analysis notebook. Loads translated reviews from `llm_outputs.review_transl
 - Lowercased, removed stopwords (preserving negation words like "not", "never"), lemmatized
 - Separate `vader_text` (with punctuation/caps) and `clean_text` (fully cleaned) fields
 
-**Models evaluated:**
+**Models evaluated (5-class: scores 1–5):**
 
 | Model | Accuracy | F1 Macro | Notes |
 |-------|----------|----------|-------|
-| TF-IDF + Logistic Regression | 69.24% | 0.3679 | High accuracy but ignores minority classes |
-| TF-IDF + Logistic Regression (balanced) | 64.78% | 0.4152 | Better minority class recall |
-| TF-IDF + LinearSVC | 69.51% | 0.3711 | Slightly better than LogReg |
-| **TF-IDF + LinearSVC (balanced)** | **67.67%** | **0.4294** | Best overall — tuned with GridSearchCV |
-| TF-IDF + Random Forest | 67.75% | 0.3253 | Struggles with sparse TF-IDF features |
-| TF-IDF + Random Forest (balanced) | 52.48% | 0.3500 | Overcompensates for class weights |
-| Word2Vec + LinearSVC (balanced) | 66.93% | 0.4218 | Averaging word vectors loses context |
-| GloVe + LinearSVC (balanced) | 63.59% | 0.3935 | Domain mismatch hurts performance |
-| LSTM (unbalanced) | 51.41% | — | Predicts majority class only |
-| LSTM (balanced) | 15.22% | — | Collapses to single class |
-| Claude (LLM) | ~75%+ | — | 3-class sentiment — evaluated on small sample only (in progress) |
+| TF-IDF + Logistic Regression | 69.43% | 0.3941 | High accuracy but ignores minority classes |
+| TF-IDF + Logistic Regression (balanced) | 57.52% | 0.4396 | Better minority class recall |
+| TF-IDF + LinearSVC | 68.36% | 0.4025 | Slightly better F1 than LogReg |
+| TF-IDF + LinearSVC (balanced) | 64.23% | 0.4274 | Improved minority class performance |
+| **TF-IDF + LinearSVC (balanced, tuned)** | **67.67%** | **0.4294** | Best traditional ML — tuned with GridSearchCV |
+| TF-IDF + Random Forest | 67.23% | 0.3445 | Struggles with sparse TF-IDF features |
+| TF-IDF + Random Forest (balanced) | 64.20% | 0.3727 | Overcompensates for class weights |
+| LR balanced - Word2Vec | 58.79% | 0.4432 | Highest F1 macro among all 5-class models |
+| LinearSVC balanced - Word2Vec | 66.95% | 0.4211 | Averaging word vectors loses context |
+| LR balanced - GloVe | 54.35% | 0.4113 | Domain mismatch hurts performance |
+| LinearSVC balanced - GloVe | 63.59% | 0.3935 | Wikipedia/news embeddings underperform |
+| LSTM | 51.01% | 0.1351 | Predicts majority class only |
+| LSTM (balanced) | 51.01% | 0.1351 | Collapses to single class |
+
+**Models evaluated (3-class: positive/negative/neutral):**
+
+| Model | Accuracy | Notes |
+|-------|----------|-------|
+| Claude (LLM) (Sample) | 69.00% | 500-review stratified sample (100 per score) |
+| **Claude (LLM)** | **83.19%** | **Full dataset — 41,818 reviews (excl. 122 unknowns)** |
 
 **Key findings:**
 
 - **VADER** captures general sentiment trends but struggles with factual complaints ("The product has not arrived yet" tagged as neutral). 36-37% neutral rate on 1-2 star reviews
-- **TF-IDF + LinearSVC (balanced)** is the best traditional ML approach. Tuned with `f1_macro` scoring and `MaxAbsScaler` to preserve TF-IDF sparsity. The C=0.01 regularization improves generalization across all classes
-- **Word2Vec** trained on our corpus slightly underperforms TF-IDF — averaging word vectors collapses word order and negation context
+- **TF-IDF + LinearSVC (balanced, tuned)** is the best traditional ML approach. Tuned with `f1_macro` scoring and `MaxAbsScaler` to preserve TF-IDF sparsity. The C=0.01 regularization improves generalization across all classes
+- **Word2Vec** trained on our corpus slightly underperforms TF-IDF on accuracy — averaging word vectors collapses word order and negation context. However, LR balanced Word2Vec achieves the highest F1 macro (0.4432) among all 5-class models
 - **GloVe** (pretrained on Wikipedia/news) performs worse than domain-trained Word2Vec due to domain mismatch. "Delivery" in Wikipedia associates with supply chains; in our corpus it associates with "fast", "late", "arrived"
 - **LSTM** fails completely — reviews are too short (~10-15 words), severe class imbalance, and linguistically indistinguishable middle classes
-- **Claude LLM** (in progress) — evaluated on a small stratified sample (500 reviews, 100 per class) where it outperforms all traditional approaches on 3-class sentiment. Full-scale batch sentiment analysis is pending
+- **Claude (LLM)** achieves **83.2% accuracy** on 41,818 reviews with only 0.29% unknown responses — the strongest result by a significant margin. 94% of 1-star reviews correctly labeled negative, 93% of 5-star reviews correctly labeled positive
 
-#### 06 — Batch Sentiment (`06_batch_sentiment.ipynb`) — *In Progress*
+#### 06 — Batch Sentiment (`06_batch_sentiment.ipynb`)
 
-Submits reviews to Anthropic's Batch API for sentiment classification.
+Submits all **41,940** reviews to Anthropic's Batch API for sentiment classification.
 
 - Each review classified as positive, negative, or neutral using Claude Haiku
 - `max_tokens=10` since only a single word response is needed
-- Batch ID saved for retrieval
-- Currently tested on a small sample; full-scale batch submission pending
+- Batch ID saved to file for retrieval
 
-#### 07 — Retrieve Sentiment Batch (`07_retrieve_sentiment_batch.ipynb`) — *In Progress*
+#### 07 — Retrieve Sentiment Batch (`07_retrieve_sentiment_batch.ipynb`)
 
-Retrieves batch sentiment results and saves to DuckDB.
+Retrieves completed batch sentiment results and saves to DuckDB.
 
+- All **41,940** requests succeeded (0 errors)
 - Results parsed and joined back to review IDs via batch index mapping
-- Will save to `llm_outputs.review_sentiments` in DuckDB once full batch completes
+- Sentiment distribution: **25,468** positive, **13,520** negative, **2,830** neutral, 122 unknown (0.29%)
+- Saved to `llm_outputs.review_sentiments` in DuckDB
+
+---
+
+## Results
+
+![Model Performance Table](screenshots/model_performance.png)
+
+![Accuracy Comparison](screenshots/accuracy_chart.png)
+
+![F1 Macro Comparison](screenshots/f1_score_chart.png)
+
+### Conclusions
+
+- **Classical ML (TF-IDF)** is the strongest traditional approach. Unbalanced models achieve high accuracy by predicting the majority class, but balanced models with F1 macro scoring are more appropriate for real-world use
+- **Word embeddings** (Word2Vec, GloVe) underperform TF-IDF on accuracy. Averaging word vectors loses word order and context. Domain-trained Word2Vec outperforms pretrained GloVe — pretrained embeddings don't always transfer well across domains
+- **LSTM** fails entirely, defaulting to majority class prediction. Short reviews, severe class imbalance, and indistinguishable middle classes make this dataset unsuitable for sequential models
+- **Claude (LLM)** achieves 83.2% accuracy — a 14 percentage point improvement over the best classical model. LLMs understand context, negation, and nuance that word-frequency models fundamentally cannot capture on small, domain-specific, multilingual datasets
 
 ---
 
@@ -139,7 +170,7 @@ Retrieves batch sentiment results and saves to DuckDB.
 LLM outputs are written directly to the shared DuckDB database (`llm_outputs` schema):
 - **`llm_outputs.translated_reviews`** — Batch API translations (39,946 reviews)
 - **`llm_outputs.review_translations_final`** — Combined translations from all sources (98,410 reviews)
-- **`llm_outputs.review_sentiments`** — Claude sentiment classifications (in progress — small sample evaluated, full batch pending)
+- **`llm_outputs.review_sentiments`** — Claude sentiment classifications (41,940 reviews)
 
 ## Tech Stack
 Python, Anthropic Claude API (Haiku), DuckDB, Pandas, NumPy, Scikit-learn, NLTK, VADER, TensorFlow/Keras (LSTM), Gensim (Word2Vec), GloVe, Plotly, Docker, Jupyter
