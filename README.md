@@ -14,7 +14,7 @@ This project demonstrates end-to-end analytics capabilities from data ingestion 
    - **Phase 1.5: Cloud Migration (Snowflake)** ✅ *Complete*
 - **Phase 2: Visualization & Analytics (Tableau)** ✅ *Complete*
 - **Phase 3: Data Science & ML** ✅ *Complete*
-- **Phase 4: Applied AI — NLP Sentiment Analysis** 🔄 *In Progress*
+- **Phase 4: Applied AI — NLP Sentiment Analysis** ✅ *Complete*
 - Phase 5: Integration & Polish
 
 ---
@@ -329,9 +329,9 @@ Key insight: Mid-Tier sellers already match Top Performers on quality — the ga
 
 ---
 
-## Phase 4: Applied AI — NLP Sentiment Analysis
+## Phase 4: Applied AI — NLP Sentiment Analysis ✅
 
-**Status:** In Progress
+**Status:** Complete
 
 AI-powered review translation and sentiment analysis on the Olist dataset. Reviews are originally in Portuguese — translated to English using Claude (Anthropic's LLM), then evaluated across multiple sentiment analysis approaches.
 
@@ -342,7 +342,7 @@ AI-powered review translation and sentiment analysis on the Olist dataset. Revie
 - **Data:** Pandas, DuckDB, Plotly
 - **Environment:** Docker, Jupyter Notebook
 
-### Translation Pipeline (Complete)
+### Translation Pipeline
 
 Two-tier Portuguese → English translation of ~40K review messages and ~11K titles:
 - **Dictionary lookup** for short reviews (<10 chars) using a curated mapping (2,507 mapped)
@@ -351,28 +351,29 @@ Two-tier Portuguese → English translation of ~40K review messages and ~11K tit
 
 ### Sentiment Analysis
 
-Multi-model comparison on translated reviews:
+Multi-model comparison on 41,940 translated reviews across three paradigms — lexicon-based, classical ML, and LLM-based:
 
 | Model | Accuracy | F1 Macro |
 |-------|----------|----------|
-| TF-IDF + Logistic Regression | 69.24% | 0.3679 |
+| TF-IDF + Logistic Regression | 69.43% | 0.3941 |
 | **TF-IDF + LinearSVC (balanced, tuned)** | **67.67%** | **0.4294** |
-| Word2Vec + LinearSVC (balanced) | 66.93% | 0.4218 |
-| GloVe + LinearSVC (balanced) | 63.59% | 0.3935 |
-| LSTM | 51.41% | — |
-| Claude LLM (small sample) | ~75%+ | — |
+| LR balanced - Word2Vec | 58.79% | 0.4432 |
+| LinearSVC balanced - Word2Vec | 66.95% | 0.4211 |
+| LinearSVC balanced - GloVe | 63.59% | 0.3935 |
+| LSTM | 51.01% | 0.1351 |
+| **Claude (LLM)** | **83.19%** | — |
 
 Key findings:
 - VADER struggles with factual complaints — 36% neutral rate on 1-2 star reviews
-- TF-IDF + LinearSVC (balanced) is the best traditional ML approach
+- TF-IDF + LinearSVC (balanced, tuned) is the best traditional ML approach (5-class)
 - GloVe underperforms domain-trained Word2Vec due to Wikipedia/news domain mismatch
 - LSTM fails on short reviews with severe class imbalance
-- Claude LLM outperforms all traditional approaches on a small sample evaluation — full-scale batch sentiment analysis in progress
+- **Claude (LLM) achieves 83.2% accuracy** on 41,818 reviews (3-class) — a 14 percentage point improvement over the best classical model. 94% of 1-star reviews correctly labeled negative, 93% of 5-star reviews correctly labeled positive
 
 ### Deliverables
 - `llm_outputs.translated_reviews` — Batch API translations (39,946 reviews)
 - `llm_outputs.review_translations_final` — Combined translations from all sources (98,410 reviews)
-- `llm_outputs.review_sentiments` — Claude sentiment classifications (in progress)
+- `llm_outputs.review_sentiments` — Claude sentiment classifications (41,940 reviews)
 
 **[View Phase 4 detailed documentation →](phase4-llm/README.md)**
 
