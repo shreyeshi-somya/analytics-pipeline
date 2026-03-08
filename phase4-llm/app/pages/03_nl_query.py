@@ -17,7 +17,6 @@ if st.button("← Back to Home"):
 
 st.title("💬 Natural Language Query")
 st.markdown("Ask questions about the Olist dataset in plain English. Claude generates SQL, runs it, and explains the results.")
-st.markdown("---")
 
 # Example questions
 examples = {

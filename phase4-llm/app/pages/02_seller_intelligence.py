@@ -18,7 +18,6 @@ if st.button("← Back to Home"):
 
 st.title("🏪 Seller Intelligence")
 st.markdown("Seller scorecards combining ML segmentation, delivery predictions, and Claude sentiment analysis.")
-st.markdown("---")
 
 # Load seller scorecard
 @st.cache_data
@@ -83,7 +82,6 @@ with col3:
 with col4:
     st.metric("Avg Delivery Days", f"{filtered['avg_actual_delivery_days'].mean():.1f}")
 
-st.markdown("---")
 
 tab1, tab2, tab3, tab4 = st.tabs(["📊 Segment Analysis", "🗺️ Geographic Distribution", "📋 Scorecard", "🔍 Seller Deep Dive"])
 
