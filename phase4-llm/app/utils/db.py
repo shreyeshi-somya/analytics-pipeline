@@ -14,7 +14,7 @@ def get_connection():
     
     if motherduck_token:
         # Production - Streamlit Cloud
-        return duckdb.connect(f'md:olist?motherduck_token={motherduck_token}')
+        return duckdb.connect(f'md:analytics?motherduck_token={motherduck_token}')
     else:
         # Local development
         return duckdb.connect('/app/data/analytics.duckdb', read_only=True)
