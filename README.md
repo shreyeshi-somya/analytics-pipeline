@@ -336,9 +336,9 @@ AI-powered review translation, sentiment analysis, and interactive analytics on 
 - **LLM:** Anthropic Claude API (Haiku + Sonnet) — translation, sentiment classification, NL query
 - **NLP:** NLTK, VADER, Gensim (Word2Vec), GloVe
 - **ML:** Scikit-learn (TF-IDF + classifiers), TensorFlow/Keras (LSTM)
-- **App:** Streamlit (multi-page)
+- **App:** Streamlit (multi-page), MotherDuck (cloud deployment)
 - **Data:** Pandas, DuckDB, Plotly
-- **Environment:** Docker, Jupyter Notebook
+- **Environment:** Docker, Jupyter Notebook, Streamlit Cloud
 
 ### Translation Pipeline
 
@@ -373,7 +373,7 @@ Key findings:
 Interactive multi-page application combining outputs from Phase 3 (ML) and Phase 4 (LLM):
 
 - **Sentiment Explorer** — Model leaderboard comparing all 13+ models, live review tester with real-time predictions from 5 approaches (VADER, TF-IDF, Word2Vec, GloVe, Claude), and sentiment distribution analysis
-- **Seller Intelligence** — Seller scorecard merging Phase 3 K-Means clusters with Claude sentiment; segment analysis, geographic Mapbox maps, filterable scorecard table, and individual seller deep dives
+- **Seller Intelligence** — Seller scorecard combining ML segmentation, delivery predictions, and Claude sentiment; segment analysis, geographic Mapbox maps, filterable scorecard table, and individual seller deep dives
 - **Natural Language Query** — Claude Sonnet translates plain English questions into SQL, executes against DuckDB, and provides business insights on the results
 
 ### Deliverables
@@ -440,6 +440,8 @@ Interactive multi-page application combining outputs from Phase 3 (ML) and Phase
 
 ### Cloud & Infrastructure:
 * Snowflake architecture and configuration
+* MotherDuck (cloud DuckDB) for Streamlit Cloud deployment
+* Streamlit Cloud hosting with environment-aware database connections
 * SSH key-pair authentication
 * Environment variable management
 * Cost optimization strategies (auto-suspend, XSMALL compute)

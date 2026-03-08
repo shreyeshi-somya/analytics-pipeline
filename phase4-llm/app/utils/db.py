@@ -2,11 +2,22 @@ import duckdb
 import pandas as pd
 import streamlit as st
 
+import os
+token = os.getenv('MOTHERDUCK_TOKEN')
+api_key = os.getenv('ANTHROPIC_API_KEY')
+
 DB_PATH = '/app/data/analytics.duckdb'
 
 @st.cache_resource
 def get_connection():
-    return duckdb.connect(DB_PATH, read_only=True)
+    motherduck_token = os.getenv('MOTHERDUCK_TOKEN')
+    
+    if motherduck_token:
+        # Production - Streamlit Cloud
+        return duckdb.connect(f'md:olist?motherduck_token={motherduck_token}')
+    else:
+        # Local development
+        return duckdb.connect('/app/data/analytics.duckdb', read_only=True)
 
 @st.cache_data
 def run_query(query: str) -> pd.DataFrame:
