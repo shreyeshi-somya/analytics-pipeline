@@ -173,9 +173,13 @@ with tab2:
                 st.caption("Domain trained")
 
             with col4:
-                st.markdown("**GloVe + LinearSVC**")
-                st.markdown(f"{score_emoji[glove_pred]} {glove_pred} star")
-                st.caption("Pretrained")
+                st.markdown("**GloVe**")
+                if models.get('has_glove'):
+                    glove_pred = predict_glove(review_text, models)
+                    st.markdown(f"{score_emoji(glove_pred)} {glove_pred}")
+                else:
+                    st.markdown("*N/A*")
+                    st.caption("Local only")
 
             with col5:
                 st.markdown("**Claude (LLM)**")
