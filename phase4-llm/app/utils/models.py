@@ -13,7 +13,10 @@ nltk.download('omw-1.4', quiet=True)
 
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # utils/
+BASE_DIR = os.path.dirname(BASE_DIR)                   # app/
+BASE_DIR = os.path.dirname(BASE_DIR)                   # phase4-llm/
+BASE_DIR = os.path.dirname(BASE_DIR)                   # analytics-pipeline/
 MODEL_DIR = os.path.join(BASE_DIR, 'data', 'models')
 GLOVE_PATH = os.path.join(BASE_DIR, 'data', 'glove_wiki_gigaword_100.model')
 
