@@ -45,7 +45,14 @@ phase4-llm/
 ├── screenshots/
 │   ├── model_performance.png              # Full results table
 │   ├── accuracy_chart.png                 # Accuracy comparison bar chart
-│   └── f1_score_chart.png                 # F1 Macro comparison bar chart
+│   ├── f1_score_chart.png                 # F1 Macro comparison bar chart
+│   ├── overview.png                       # Streamlit app home page
+│   ├── model_leaderboard.png              # Sentiment Explorer — leaderboard tab
+│   ├── live_review_tester.png             # Sentiment Explorer — live tester tab
+│   ├── sentiment_distribution.png         # Sentiment Explorer — distribution tab
+│   ├── seller_intelligence.png            # Seller Intelligence dashboard
+│   ├── nl_query_1.png                     # NL Query — question input
+│   └── nl_query_2.png                     # NL Query — results & insights
 └── README.md
 ```
 
@@ -180,6 +187,10 @@ Retrieves completed batch sentiment results and saves to DuckDB.
 
 Interactive analytics application built on top of the translation and sentiment analysis pipeline. Combines outputs from Phase 3 (ML seller segmentation) and Phase 4 (LLM sentiment) into a unified dashboard.
 
+**Live app:** [analytics-pipeline-shreyeshi.streamlit.app](https://analytics-pipeline-shreyeshi.streamlit.app/)
+
+![App Overview](screenshots/overview.png)
+
 ### Home (`streamlit_app.py`)
 
 Landing page with navigation to the three main features and an overview of the end-to-end pipeline across all phases.
@@ -192,6 +203,12 @@ Interactive sentiment model comparison tool with three tabs:
 - **Live Review Tester** — Paste any review or select an example, then see real-time predictions from all 5 approaches (VADER, TF-IDF + LinearSVC, Word2Vec, GloVe, Claude LLM) side by side
 - **Sentiment Distribution** — Distribution of Claude's sentiment labels across 41,818 translated reviews with stacked bar charts and KPI metrics
 
+![Model Leaderboard](screenshots/model_leaderboard.png)
+
+![Live Review Tester](screenshots/live_review_tester.png)
+
+![Sentiment Distribution](screenshots/sentiment_distribution.png)
+
 ### 02 — Seller Intelligence (`pages/02_seller_intelligence.py`)
 
 Seller scorecard dashboard combining ML segmentation, delivery predictions, and Claude sentiment analysis. Combines `ml_outputs.seller_clusters` with Claude sentiment classifications and delivery metrics to provide a unified view of seller performance.
@@ -200,6 +217,8 @@ Seller scorecard dashboard combining ML segmentation, delivery predictions, and 
 - **Geographic Distribution** — Interactive Mapbox map of seller locations colored by selected metric; state-level and regional aggregations
 - **Scorecard** — Filterable table of all sellers with metrics: cluster, total orders, average review score, sentiment score, delivery days, and positive/neutral/negative review counts
 - **Seller Deep Dive** — Individual seller lookup with detailed metrics, sentiment breakdown pie chart, and location map
+
+![Seller Intelligence](screenshots/seller_intelligence.png)
 
 ### 03 — Natural Language Query (`pages/03_nl_query.py`)
 
@@ -210,6 +229,10 @@ Claude-powered natural language interface for querying the Olist dataset.
 - Executes the generated SQL against DuckDB and displays results
 - Claude then provides 2-3 sentence business insights explaining the results
 - Includes 7 example questions covering product categories, seller performance, delivery correlations, regional sentiment, and freight cost analysis
+
+![NL Query](screenshots/nl_query_1.png)
+
+![NL Query Results](screenshots/nl_query_2.png)
 
 ### Utilities
 

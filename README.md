@@ -295,8 +295,10 @@ ECOMM_ANALYTICS (Database)
 - Category bottleneck: Electronics (high volume + slow delivery)
 - On-time challenge: 91.8% vs estimated, only 51.8% meet 10-day target
 
-**Tools:** Tableau Public, dbt seed files for reference data  
+**Tools:** Tableau Public, dbt seed files for reference data
 **Skills:** Advanced calculations, interactive design, data storytelling, executive presentation
+
+![Tableau Executive Overview](phase2-tableau-data-vis/screenshots/dashboard1/overview.png)
 
 [View Dashboards →](phase2-tableau-data-vis/)
 
@@ -403,11 +405,15 @@ Key findings:
 
 ### Streamlit App
 
+**Live app:** [analytics-pipeline-shreyeshi.streamlit.app](https://analytics-pipeline-shreyeshi.streamlit.app/)
+
 Interactive multi-page application combining outputs from Phase 3 (ML) and Phase 4 (LLM):
 
 - **Sentiment Explorer** — Model leaderboard comparing all 13+ models, live review tester with real-time predictions from 5 approaches (VADER, TF-IDF, Word2Vec, GloVe, Claude), and sentiment distribution analysis
 - **Seller Intelligence** — Seller scorecard combining ML segmentation, delivery predictions, and Claude sentiment; segment analysis, geographic Mapbox maps, filterable scorecard table, and individual seller deep dives
 - **Natural Language Query** — Claude Sonnet translates plain English questions into SQL, executes against DuckDB, and provides business insights on the results
+
+![Streamlit App Overview](phase4-llm/screenshots/overview.png)
 
 ### Deliverables
 - `llm_outputs.translated_reviews` — Batch API translations (39,946 reviews)

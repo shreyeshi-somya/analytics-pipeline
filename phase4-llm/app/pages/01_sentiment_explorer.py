@@ -23,8 +23,6 @@ if st.button("← Back to Home"):
 
 st.title("🔍 Sentiment Explorer")
 st.markdown("Comparing five NLP approaches on 40K+ Brazilian e-commerce reviews.")
-st.markdown("---")
-
 
 tab1, tab2, tab3 = st.tabs(["🏆 Model Leaderboard", "🧪 Live Review Tester", "📊 Sentiment Distribution"])
 
