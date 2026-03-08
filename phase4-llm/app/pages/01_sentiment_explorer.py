@@ -133,7 +133,7 @@ with tab2:
                 w2v_pred = predict_w2v(review_text, models)
                 
                 # GloVe
-                glove_pred = predict_glove(review_text, models)
+                glove_pred = predict_glove(review_text, models) if models.get('has_glove') else None
                 
                 # Claude
                 client = anthropic.Anthropic()
