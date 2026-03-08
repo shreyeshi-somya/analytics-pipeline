@@ -1,7 +1,7 @@
 import joblib
 import numpy as np
 import re
-from gensim.models import Word2Vec, KeyedVectors
+from gensim.models import Word2Vec
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import streamlit as st
 import nltk
@@ -46,12 +46,14 @@ def load_models():
     
     # GloVe
     try:
+        from gensim.models import KeyedVectors
         models['glove'] = KeyedVectors.load(GLOVE_PATH)
         models['glove_clf'] = joblib.load(f'{MODEL_DIR}/glove_linearsvc_balanced.pkl')
         models['has_glove'] = True
-    except:
+    except Exception as e:
+        print(f"GloVe not available: {e}", file=sys.stderr)
         models['has_glove'] = False
-    
+        
     return models, stop_words, lemmatizer
 
 def clean_text(text, stop_words, lemmatizer):
