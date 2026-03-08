@@ -11,9 +11,11 @@ nltk.download('wordnet', quiet=True)
 nltk.download('stopwords', quiet=True)
 nltk.download('omw-1.4', quiet=True)
 
+import os
 
-MODEL_DIR = '/app/data/models'
-GLOVE_PATH = '/app/data/glove_wiki_gigaword_100.model'
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODEL_DIR = os.path.join(BASE_DIR, 'data', 'models')
+GLOVE_PATH = os.path.join(BASE_DIR, 'data', 'glove_wiki_gigaword_100.model')
 
 @st.cache_resource
 def load_models():
@@ -35,8 +37,12 @@ def load_models():
     models['w2v_clf'] = joblib.load(f'{MODEL_DIR}/w2v_linearsvc_balanced.pkl')
     
     # GloVe
-    models['glove'] = KeyedVectors.load(GLOVE_PATH)
-    models['glove_clf'] = joblib.load(f'{MODEL_DIR}/glove_linearsvc_balanced.pkl')
+    try:
+        models['glove'] = KeyedVectors.load(GLOVE_PATH)
+        models['glove_clf'] = joblib.load(f'{MODEL_DIR}/glove_linearsvc_balanced.pkl')
+        models['has_glove'] = True
+    except:
+        models['has_glove'] = False
     
     return models, stop_words, lemmatizer
 
