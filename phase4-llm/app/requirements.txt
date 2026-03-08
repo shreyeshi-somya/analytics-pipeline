@@ -6,7 +6,8 @@ plotly
 python-dotenv
 vaderSentiment
 scikit-learn
-gensim
+scipy
 numpy
+gensim
 nltk
 joblib
