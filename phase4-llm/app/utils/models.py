@@ -18,6 +18,11 @@ BASE_DIR = os.path.dirname(BASE_DIR)                   # app/
 BASE_DIR = os.path.dirname(BASE_DIR)                   # phase4-llm/
 BASE_DIR = os.path.dirname(BASE_DIR)                   # analytics-pipeline/
 MODEL_DIR = os.path.join(BASE_DIR, 'data', 'models')
+
+import sys
+print(f"__file__: {os.path.abspath(__file__)}", file=sys.stderr)
+print(f"MODEL_DIR: {MODEL_DIR}", file=sys.stderr)
+
 GLOVE_PATH = os.path.join(BASE_DIR, 'data', 'glove_wiki_gigaword_100.model')
 
 @st.cache_resource
