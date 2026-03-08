@@ -13,7 +13,7 @@ This phase builds on the clean data models from Phase 1 (dbt), seller segmentati
 
 ## Infrastructure
 
-Runs as the `llm-app` service in the root `docker-compose.yml`. Shares a DuckDB database (`data/analytics.duckdb`) with the dbt and data science services. Requires an Anthropic API key set in `.env`.
+Runs as the `llm-app` service in the root `docker-compose.yml`. Shares a DuckDB database (`data/analytics.duckdb`) with the dbt and data science services. Requires an Anthropic API key and (for cloud deployment) a MotherDuck token set in `.env`.
 
 **Deployment:** Supports both local Docker development and cloud deployment via Streamlit Cloud. The database layer auto-detects the environment — connects to MotherDuck (cloud DuckDB) when `MOTHERDUCK_TOKEN` is set, otherwise falls back to the local DuckDB file.
 
@@ -22,7 +22,7 @@ Runs as the `llm-app` service in the root `docker-compose.yml`. Shares a DuckDB 
 phase4-llm/
 ├── Dockerfile
 ├── requirements.txt
-├── .env                          # ANTHROPIC_API_KEY (not committed)
+├── .env                          # ANTHROPIC_API_KEY, MOTHERDUCK_TOKEN (not committed)
 ├── app/
 │   ├── 01_batch_translate_reviews.ipynb   # Translation pipeline
 │   ├── 02_submit_batch.ipynb              # Batch API submission
