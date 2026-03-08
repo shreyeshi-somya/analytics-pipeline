@@ -56,21 +56,19 @@ df['sentiment_score'] = (
 ).round(2)
 
 # Filters
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns(2)
 with col1:
     cluster_order = ['All', 'Top Performers', 'Mid-Tier', 'Small & Reliable', 'Underperformers']
     clusters = [c for c in cluster_order if c == 'All' or c in df['cluster_name'].dropna().unique().tolist()]
     selected_cluster = st.selectbox("Seller Segment", clusters)
 with col2:
     min_orders = st.slider("Minimum Orders", 1, 100, 10)
-with col3:
-    sort_by = st.selectbox("Sort By", ['avg_review_score', 'sentiment_score', 'total_orders', 'avg_actual_delivery_days'])
 
 # Filter
 filtered = df[df['total_orders'] >= min_orders].copy()
 if selected_cluster != 'All':
     filtered = filtered[filtered['cluster_name'] == selected_cluster]
-filtered = filtered.sort_values(sort_by, ascending=False).reset_index(drop=True)
+filtered = filtered.sort_values('avg_review_score', ascending=False).reset_index(drop=True)
 
 st.markdown(f"Showing **{len(filtered):,}** sellers")
 
@@ -305,22 +303,6 @@ with tab4:
                 }
             )
             st.plotly_chart(fig, use_container_width=True)
-
-            
-
-            # mini map
-            if pd.notna(row['seller_geolocation_latitude']):
-                fig_loc = px.scatter_mapbox(
-                    match,
-                    lat='seller_geolocation_latitude',
-                    lon='seller_geolocation_longitude',
-                    mapbox_style='carto-darkmatter',
-                    zoom=8,
-                    center={"lat": row['seller_geolocation_latitude'], "lon": row['seller_geolocation_longitude']},
-                    height=300
-                )
-                fig_loc.update_traces(marker=dict(size=15, color='#2EC4B6'))
-                st.plotly_chart(fig_loc, use_container_width=True)
 
 
             
