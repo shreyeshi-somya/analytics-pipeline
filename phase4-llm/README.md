@@ -15,6 +15,8 @@ This phase builds on the clean data models from Phase 1 (dbt), seller segmentati
 
 Runs as the `llm-app` service in the root `docker-compose.yml`. Shares a DuckDB database (`data/analytics.duckdb`) with the dbt and data science services. Requires an Anthropic API key set in `.env`.
 
+**Deployment:** Supports both local Docker development and cloud deployment via Streamlit Cloud. The database layer auto-detects the environment — connects to MotherDuck (cloud DuckDB) when `MOTHERDUCK_TOKEN` is set, otherwise falls back to the local DuckDB file.
+
 ## Folder Structure
 ```
 phase4-llm/
@@ -191,7 +193,7 @@ Interactive sentiment model comparison tool with three tabs:
 
 ### 02 — Seller Intelligence (`pages/02_seller_intelligence.py`)
 
-Seller scorecard dashboard merging Phase 3 K-Means clustering with Phase 4 sentiment analysis. Combines `ml_outputs.seller_clusters` with Claude sentiment classifications to provide a unified view of seller performance.
+Seller scorecard dashboard combining ML segmentation, delivery predictions, and Claude sentiment analysis. Combines `ml_outputs.seller_clusters` with Claude sentiment classifications and delivery metrics to provide a unified view of seller performance.
 
 - **Segment Analysis** — Average review score and sentiment by cluster (Top Performers, Mid-Tier, Small & Reliable, Underperformers); scatter plot of delivery days vs sentiment score
 - **Geographic Distribution** — Interactive Mapbox map of seller locations colored by selected metric; state-level and regional aggregations
@@ -210,8 +212,8 @@ Claude-powered natural language interface for querying the Olist dataset.
 
 ### Utilities
 
-- **`utils/db.py`** — Cached DuckDB connection (read-only), query execution, and schema introspection
-- **`utils/models.py`** — Loads and caches all trained ML models (VADER, TF-IDF vectorizer + LinearSVC, Word2Vec + LinearSVC, GloVe + LinearSVC) with text preprocessing and prediction functions
+- **`utils/db.py`** — Cached DuckDB connection with dual-mode support (local DuckDB or MotherDuck cloud), query execution, and schema introspection
+- **`utils/models.py`** — Loads and caches all trained ML models (VADER, TF-IDF vectorizer + LinearSVC, Word2Vec + LinearSVC, GloVe + LinearSVC) with text preprocessing, NLTK data management, and prediction functions
 
 ---
 
@@ -223,4 +225,4 @@ LLM outputs are written directly to the shared DuckDB database (`llm_outputs` sc
 - **`llm_outputs.review_sentiments`** — Claude sentiment classifications (41,940 reviews)
 
 ## Tech Stack
-Python, Anthropic Claude API (Haiku + Sonnet), Streamlit, DuckDB, Pandas, NumPy, Scikit-learn, NLTK, VADER, TensorFlow/Keras (LSTM), Gensim (Word2Vec), GloVe, Plotly, Docker, Jupyter
+Python, Anthropic Claude API (Haiku + Sonnet), Streamlit, DuckDB, MotherDuck, Pandas, NumPy, Scikit-learn, NLTK, VADER, TensorFlow/Keras (LSTM), Gensim (Word2Vec), GloVe, Plotly, Docker, Jupyter

@@ -4,6 +4,13 @@ import re
 from gensim.models import Word2Vec, KeyedVectors
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import streamlit as st
+import nltk
+
+# Download NLTK data if not present
+nltk.download('wordnet', quiet=True)
+nltk.download('stopwords', quiet=True)
+nltk.download('omw-1.4', quiet=True)
+
 
 MODEL_DIR = '/app/data/models'
 GLOVE_PATH = '/app/data/glove_wiki_gigaword_100.model'

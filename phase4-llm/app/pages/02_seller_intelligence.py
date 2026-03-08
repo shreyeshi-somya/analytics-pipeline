@@ -226,14 +226,14 @@ with tab3:
     # Scorecard table
     display = filtered[[
         'seller_id', 'cluster_name', 'total_orders', 'avg_review_score',
-        'sentiment_score', 'avg_actual_delivery_days', 'avg_predicted_delivery_days',
+        'sentiment_score', 'avg_actual_delivery_days', 
         'positive_reviews', 'negative_reviews', 'neutral_reviews'
     ]].copy()
     display['seller_id'] = display['seller_id']
     display['sentiment_score'] = display['sentiment_score'].apply(lambda x: f'{x:.1%}')
     display['avg_review_score'] = display['avg_review_score'].apply(lambda x: f'{x:.2f}')
     display['avg_actual_delivery_days'] = display['avg_actual_delivery_days'].apply(lambda x: f'{x:.1f}')
-    display['avg_predicted_delivery_days'] = display['avg_predicted_delivery_days'].apply(lambda x: f'{x:.1f}')
+
     display.index += 1
     st.dataframe(display, use_container_width=True, height=(min(len(display), 20) + 1) * 35 + 3)                
 
