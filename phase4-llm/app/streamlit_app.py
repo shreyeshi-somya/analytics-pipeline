@@ -10,7 +10,7 @@ st.set_page_config(
 st.markdown("""
     <style>
         .block-container {
-            padding-top: 1rem;
+            padding-top: 2.5rem;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -64,9 +64,18 @@ with col3:
 st.markdown("---")
 
 st.markdown("""
-**Pipeline Overview**
-- **Phase 1** — dbt data modeling + DuckDB warehouse (local) + Snowflake (cloud)
-- **Phase 2** — Tableau dashboards (Executive Overview + Delivery Performance)
-- **Phase 3** — ML: seller segmentation (K-Means) + delivery prediction (XGBoost)
-- **Phase 4** — Applied AI: Portuguese translation + multi-model sentiment analysis
+### Pipeline Overview
+
+This project is a four-phase analytics pipeline that takes raw Brazilian e-commerce data through transformation,
+visualization, machine learning, and AI-powered analysis. Each phase builds on the outputs of the previous one,
+with a shared DuckDB database connecting all stages.
+
+| Phase | Focus | Key Tools |
+|-------|-------|-----------|
+| **Phase 1** | Data modeling & warehousing — 15+ dbt models transforming raw CSVs into analytics-ready tables | dbt, DuckDB, Snowflake |
+| **Phase 2** | Business intelligence — Executive overview and delivery performance dashboards | Tableau |
+| **Phase 3** | Machine learning — K-Means seller segmentation and XGBoost delivery prediction | Scikit-learn, XGBoost |
+| **Phase 4** | Applied AI — Portuguese→English translation, multi-model sentiment analysis, and this Streamlit app | Claude API, NLTK, Gensim, Streamlit |
+
+👉 **Full source code & documentation:** [github.com/shreyeshi-somya/analytics-pipeline](https://github.com/shreyeshi-somya/analytics-pipeline)
 """)

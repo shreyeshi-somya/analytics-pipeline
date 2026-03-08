@@ -13,17 +13,18 @@ nltk.download('omw-1.4', quiet=True)
 
 import os
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # utils/
-BASE_DIR = os.path.dirname(BASE_DIR)                   # app/
-BASE_DIR = os.path.dirname(BASE_DIR)                   # phase4-llm/
-BASE_DIR = os.path.dirname(BASE_DIR)                   # analytics-pipeline/
-MODEL_DIR = os.path.join(BASE_DIR, 'data', 'models')
-
-import sys
-print(f"__file__: {os.path.abspath(__file__)}", file=sys.stderr)
-print(f"MODEL_DIR: {MODEL_DIR}", file=sys.stderr)
-
-GLOVE_PATH = os.path.join(BASE_DIR, 'data', 'glove_wiki_gigaword_100.model')
+# In Docker: /app/data/models (volumes mount data into /app/data)
+# Locally / Streamlit Cloud: walk up from utils/ -> app/ -> phase4-llm/ -> analytics-pipeline/
+if os.path.exists('/app/data/models'):
+    MODEL_DIR = '/app/data/models'
+    GLOVE_PATH = '/app/data/glove_wiki_gigaword_100.model'
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # utils/
+    BASE_DIR = os.path.dirname(BASE_DIR)                   # app/
+    BASE_DIR = os.path.dirname(BASE_DIR)                   # phase4-llm/
+    BASE_DIR = os.path.dirname(BASE_DIR)                   # analytics-pipeline/
+    MODEL_DIR = os.path.join(BASE_DIR, 'data', 'models')
+    GLOVE_PATH = os.path.join(BASE_DIR, 'data', 'glove_wiki_gigaword_100.model')
 
 @st.cache_resource
 def load_models():

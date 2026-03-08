@@ -12,7 +12,7 @@ st.set_page_config(page_title="Sentiment Explorer", layout="wide")
 
 st.markdown("""
     <style>
-        .block-container { padding-top: 1rem; }
+        .block-container { padding-top: 2.5rem; }
         div[data-testid="stRadio"] { margin-bottom: 0rem; }
         div[data-testid="stPlotlyChart"] { margin-top: 0rem; }
     </style>
@@ -176,7 +176,7 @@ with tab2:
                 st.markdown("**GloVe**")
                 if models.get('has_glove'):
                     glove_pred = predict_glove(review_text, models)
-                    st.markdown(f"{score_emoji(glove_pred)} {glove_pred}")
+                    st.markdown(f"{score_emoji[glove_pred]} {glove_pred} star")
                 else:
                     st.markdown("*N/A*")
                     st.caption("Local only")
@@ -268,19 +268,26 @@ with tab3:
     """)
 
     total_reviews = total['count'].sum()
-    col1, col2, col3 = st.columns(3)
+    pos = int(total[total['claude_sentiment'] == 'positive']['count'].values[0])
+    neu = int(total[total['claude_sentiment'] == 'neutral']['count'].values[0])
+    neg = int(total[total['claude_sentiment'] == 'negative']['count'].values[0])
 
-    with col1:
-        pos = total[total['claude_sentiment'] == 'positive']['count'].values[0]
-        st.metric("Positive Reviews", f"{pos:,}")
-        st.markdown(f"<span style='font-size: 0.9rem; margin-top: -1rem; display: block; color: #2EC4B6;'>{pos/total_reviews:.1%} of total</span>", unsafe_allow_html=True)
-
-    with col2:
-        neu = total[total['claude_sentiment'] == 'neutral']['count'].values[0]
-        st.metric("Neutral Reviews", f"{neu:,}")
-        st.markdown(f"<span style='font-size: 0.9rem; margin-top: -1rem; display: block; color: #8B8FA8;'>{neu/total_reviews:.1%} of total</span>", unsafe_allow_html=True)
-
-    with col3:
-        neg = total[total['claude_sentiment'] == 'negative']['count'].values[0]
-        st.metric("Negative Reviews", f"{neg:,}")
-        st.markdown(f"<span style='font-size: 0.9rem; margin-top: -1rem; display: block; color: #E76F51;'>{neg/total_reviews:.1%} of total</span>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div style="display: flex; justify-content: space-evenly; margin-top: 1rem;">
+        <div style="text-align: center;">
+            <div style="font-size: 0.9rem; color: #888;">Positive Reviews</div>
+            <div style="font-size: 1.8rem; font-weight: 600;">{pos:,}</div>
+            <div style="font-size: 0.9rem; color: #2EC4B6;">{pos/total_reviews:.1%} of total</div>
+        </div>
+        <div style="text-align: center;">
+            <div style="font-size: 0.9rem; color: #888;">Neutral Reviews</div>
+            <div style="font-size: 1.8rem; font-weight: 600;">{neu:,}</div>
+            <div style="font-size: 0.9rem; color: #8B8FA8;">{neu/total_reviews:.1%} of total</div>
+        </div>
+        <div style="text-align: center;">
+            <div style="font-size: 0.9rem; color: #888;">Negative Reviews</div>
+            <div style="font-size: 1.8rem; font-weight: 600;">{neg:,}</div>
+            <div style="font-size: 0.9rem; color: #E76F51;">{neg/total_reviews:.1%} of total</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)

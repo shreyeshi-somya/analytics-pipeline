@@ -19,7 +19,16 @@ Built across four phases, this project takes raw e-commerce data from ingestion 
 analytics-pipeline/
 ├── docker-compose.yml              # Centralized orchestration for all phases
 ├── data/
-│   └── analytics.duckdb            # Shared DuckDB database across phases
+│   ├── analytics.duckdb            # Shared DuckDB database across phases
+│   └── models/                     # Trained ML models (used by Streamlit app)
+│       ├── stop_words.pkl
+│       ├── lemmatizer.pkl
+│       ├── tfidf_vectorizer.pkl
+│       ├── tfidf_linearsvc_tuned.pkl
+│       ├── tfidf_linearsvc_balanced.pkl
+│       ├── w2v_linearsvc_balanced.pkl
+│       ├── word2vec.model
+│       └── glove_linearsvc_balanced.pkl
 ├── phase1-dbt-platform/
 │   ├── Dockerfile
 │   ├── SNOWFLAKE.md                # Snowflake migration documentation
@@ -45,9 +54,10 @@ analytics-pipeline/
 │   └── outputs/                    # Model visualizations and plots
 └── phase4-llm/
     ├── Dockerfile
-    ├── requirements.txt
+    ├── requirements.txt            # Docker dependencies (notebooks + app)
     ├── .env                        # ANTHROPIC_API_KEY, MOTHERDUCK_TOKEN (not committed)
     ├── app/
+    │   ├── requirements.txt        # Streamlit Cloud dependencies (pinned)
     │   ├── 01–07_*.ipynb           # Translation & sentiment analysis notebooks
     │   ├── streamlit_app.py        # Streamlit app entry point
     │   ├── pages/
