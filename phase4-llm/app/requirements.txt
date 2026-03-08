@@ -8,6 +8,6 @@ vaderSentiment
 scikit-learn
 scipy
 numpy
-gensim
+gensim==4.3.2
 nltk
 joblib
