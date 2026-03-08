@@ -49,6 +49,8 @@ phase1-dbt-platform/.env
 .ipynb_checkpoints/
 .Trash-0/
 logs/data/
-/data/
 /data/*
+!/data/models/
+!/data/models/*.pkl
+!/data/models/*.model
 logs/*
