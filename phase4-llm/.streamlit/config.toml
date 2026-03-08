@@ -1,0 +1,5 @@
+[ui]
+hideSidebarNav = false
+
+[client]
+toolbarMode = "minimal"
