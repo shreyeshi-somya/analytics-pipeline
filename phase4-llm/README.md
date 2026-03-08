@@ -21,9 +21,10 @@ Runs as the `llm-app` service in the root `docker-compose.yml`. Shares a DuckDB 
 ```
 phase4-llm/
 ├── Dockerfile
-├── requirements.txt
-├── .env                          # ANTHROPIC_API_KEY, MOTHERDUCK_TOKEN (not committed)
+├── requirements.txt                       # Docker dependencies (notebooks + app)
+├── .env                                   # ANTHROPIC_API_KEY, MOTHERDUCK_TOKEN (not committed)
 ├── app/
+│   ├── requirements.txt                   # Streamlit Cloud dependencies (pinned)
 │   ├── 01_batch_translate_reviews.ipynb   # Translation pipeline
 │   ├── 02_submit_batch.ipynb              # Batch API submission
 │   ├── 03_retrieve_batch.ipynb            # Batch API retrieval
@@ -37,8 +38,8 @@ phase4-llm/
 │   │   ├── 02_seller_intelligence.py      # Seller scorecard & analytics
 │   │   └── 03_nl_query.py                 # Natural language SQL query interface
 │   ├── utils/
-│   │   ├── db.py                          # DuckDB connection & query utilities
-│   │   └── models.py                      # ML model loading & prediction
+│   │   ├── db.py                          # DuckDB / MotherDuck connection & query utilities
+│   │   └── models.py                      # ML model loading & prediction (environment-aware paths)
 │   ├── short_review_lookup.csv            # Portuguese→English dictionary for short reviews
 │   └── download_models.py                 # GloVe + NLTK data downloader
 ├── screenshots/
@@ -213,7 +214,7 @@ Claude-powered natural language interface for querying the Olist dataset.
 ### Utilities
 
 - **`utils/db.py`** — Cached DuckDB connection with dual-mode support (local DuckDB or MotherDuck cloud), query execution, and schema introspection
-- **`utils/models.py`** — Loads and caches all trained ML models (VADER, TF-IDF vectorizer + LinearSVC, Word2Vec + LinearSVC, GloVe + LinearSVC) with text preprocessing, NLTK data management, and prediction functions
+- **`utils/models.py`** — Loads and caches trained ML models from `data/models/` (VADER, TF-IDF vectorizer + LinearSVC, Word2Vec + LinearSVC, optionally GloVe + LinearSVC) with environment-aware path detection (Docker `/app/data/models` vs relative paths for Streamlit Cloud), text preprocessing, NLTK data management, and prediction functions. GloVe is optional — the 160MB pretrained vectors are too large for the repo, so the app gracefully falls back to "N/A" when unavailable
 
 ---
 

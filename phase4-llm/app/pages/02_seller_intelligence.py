@@ -9,7 +9,7 @@ st.set_page_config(page_title="Seller Intelligence", layout="wide")
 
 st.markdown("""
     <style>
-        .block-container { padding-top: 1rem; }
+        .block-container { padding-top: 2.5rem; }
     </style>
 """, unsafe_allow_html=True)
 
