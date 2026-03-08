@@ -1,10 +1,10 @@
 # End-to-End Analytics Pipeline
 
-A comprehensive data analytics project showcasing modern data engineering and analytics practices across multiple phases.
+A full-stack analytics project on the Brazilian Olist e-commerce dataset (100K+ orders, 3K sellers, 98K reviews). Covers data modeling with dbt, Tableau dashboards, ML-based seller segmentation and delivery prediction, LLM-powered sentiment analysis using Claude, and an interactive Streamlit app with natural language querying — all orchestrated with Docker and sharing a single DuckDB database across phases.
 
 ## Project Overview
 
-This project demonstrates end-to-end analytics capabilities from data ingestion through visualization, using real-world e-commerce data.
+Built across four phases, this project takes raw e-commerce data from ingestion to insight: dbt transformations and data quality testing (Phase 1), interactive Tableau dashboards (Phase 2), ML models for clustering and prediction (Phase 3), and NLP sentiment analysis with a Streamlit app powered by Claude (Phase 4).
 
 ### Phases
 
@@ -13,6 +13,54 @@ This project demonstrates end-to-end analytics capabilities from data ingestion 
 - **Phase 2: Visualization & Analytics (Tableau)** ✅ *Complete*
 - **Phase 3: Data Science & ML** ✅ *Complete*
 - **Phase 4: Applied AI — NLP Sentiment Analysis** ✅ *Complete*
+
+### Project Structure
+```
+analytics-pipeline/
+├── docker-compose.yml              # Centralized orchestration for all phases
+├── data/
+│   └── analytics.duckdb            # Shared DuckDB database across phases
+├── phase1-dbt-platform/
+│   ├── Dockerfile
+│   ├── SNOWFLAKE.md                # Snowflake migration documentation
+│   ├── dbt_project/
+│   │   ├── models/
+│   │   │   ├── staging/            # Clean, typed data from sources (9 models)
+│   │   │   ├── intermediate/       # Business logic & transformations (9 models)
+│   │   │   └── marts/              # Final analytical models (6 models)
+│   │   ├── macros/                 # Custom reusable SQL functions (3 macros)
+│   │   ├── tests/                  # Data quality tests (30+ tests)
+│   │   └── seeds/                  # Reference data (3 seed files)
+│   ├── data/
+│   │   └── raw/                    # Source CSV files (not committed)
+│   └── scripts/
+│       └── load_data.py            # Data ingestion script
+├── phase2-tableau-data-vis/
+│   ├── README.md                   # Tableau dashboard documentation
+│   └── screenshots/                # Dashboard screenshots
+├── phase3-data-science/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── notebooks/                  # Jupyter notebooks (EDA, clustering, prediction)
+│   └── outputs/                    # Model visualizations and plots
+└── phase4-llm/
+    ├── Dockerfile
+    ├── requirements.txt
+    ├── .env                        # ANTHROPIC_API_KEY, MOTHERDUCK_TOKEN (not committed)
+    ├── app/
+    │   ├── 01–07_*.ipynb           # Translation & sentiment analysis notebooks
+    │   ├── streamlit_app.py        # Streamlit app entry point
+    │   ├── pages/
+    │   │   ├── 01_sentiment_explorer.py
+    │   │   ├── 02_seller_intelligence.py
+    │   │   └── 03_nl_query.py
+    │   ├── utils/
+    │   │   ├── db.py               # DuckDB / MotherDuck connection
+    │   │   └── models.py           # ML model loading & prediction
+    │   ├── short_review_lookup.csv
+    │   └── download_models.py
+    └── screenshots/                # Model comparison charts
+```
 
 ---
 
@@ -35,31 +83,6 @@ Built a production-grade data transformation pipeline using dbt, DuckDB, and Doc
 - **Languages:** SQL, Python
 - **Testing:** dbt tests (generic, singular, custom)
 - **Data:** Brazilian E-commerce (Olist dataset)
-
-### Project Structure
-```
-analytics-pipeline/
-├── docker-compose.yml          # Centralized orchestration for all phases
-├── data/
-│   └── analytics.duckdb        # Shared DuckDB database across phases
-├── phase1-dbt-platform/
-│   ├── Dockerfile
-│   ├── dbt_project/
-│   │   ├── models/
-│   │   │   ├── staging/        # Clean, typed data from sources (9 models)
-│   │   │   ├── intermediate/   # Business logic & transformations (9 models)
-│   │   │   └── marts/          # Final analytical models (6 models)
-│   │   ├── macros/             # Custom reusable SQL functions (3 macros)
-│   │   ├── tests/              # Data quality tests (30+ tests)
-│   │   └── seeds/              # Reference data (3 seed files)
-│   ├── data/
-│   │   └── raw/               # Source CSV files (not committed)
-│   └── scripts/
-│       └── load_data.py       # Data ingestion script
-└── phase3-data-science/
-    ├── Dockerfile
-    └── notebooks/              # Jupyter notebooks (EDA, ML)
-```
 
 ### Key Features
 
