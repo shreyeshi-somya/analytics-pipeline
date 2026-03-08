@@ -1,5 +1,3 @@
-> 🚧 **Work in Progress** — This project is actively being developed.
-
 # End-to-End Analytics Pipeline
 
 A comprehensive data analytics project showcasing modern data engineering and analytics practices across multiple phases.
@@ -15,7 +13,6 @@ This project demonstrates end-to-end analytics capabilities from data ingestion 
 - **Phase 2: Visualization & Analytics (Tableau)** ✅ *Complete*
 - **Phase 3: Data Science & ML** ✅ *Complete*
 - **Phase 4: Applied AI — NLP Sentiment Analysis** ✅ *Complete*
-- Phase 5: Integration & Polish
 
 ---
 
@@ -333,12 +330,13 @@ Key insight: Mid-Tier sellers already match Top Performers on quality — the ga
 
 **Status:** Complete
 
-AI-powered review translation and sentiment analysis on the Olist dataset. Reviews are originally in Portuguese — translated to English using Claude (Anthropic's LLM), then evaluated across multiple sentiment analysis approaches.
+AI-powered review translation, sentiment analysis, and interactive analytics on the Olist dataset. Reviews are originally in Portuguese — translated to English using Claude, evaluated across multiple sentiment analysis approaches, and surfaced through a Streamlit app with seller intelligence and natural language querying.
 
 ### Tech Stack
-- **LLM:** Anthropic Claude API (Haiku) — translation + sentiment classification
+- **LLM:** Anthropic Claude API (Haiku + Sonnet) — translation, sentiment classification, NL query
 - **NLP:** NLTK, VADER, Gensim (Word2Vec), GloVe
 - **ML:** Scikit-learn (TF-IDF + classifiers), TensorFlow/Keras (LSTM)
+- **App:** Streamlit (multi-page)
 - **Data:** Pandas, DuckDB, Plotly
 - **Environment:** Docker, Jupyter Notebook
 
@@ -370,10 +368,19 @@ Key findings:
 - LSTM fails on short reviews with severe class imbalance
 - **Claude (LLM) achieves 83.2% accuracy** on 41,818 reviews (3-class) — a 14 percentage point improvement over the best classical model. 94% of 1-star reviews correctly labeled negative, 93% of 5-star reviews correctly labeled positive
 
+### Streamlit App
+
+Interactive multi-page application combining outputs from Phase 3 (ML) and Phase 4 (LLM):
+
+- **Sentiment Explorer** — Model leaderboard comparing all 13+ models, live review tester with real-time predictions from 5 approaches (VADER, TF-IDF, Word2Vec, GloVe, Claude), and sentiment distribution analysis
+- **Seller Intelligence** — Seller scorecard merging Phase 3 K-Means clusters with Claude sentiment; segment analysis, geographic Mapbox maps, filterable scorecard table, and individual seller deep dives
+- **Natural Language Query** — Claude Sonnet translates plain English questions into SQL, executes against DuckDB, and provides business insights on the results
+
 ### Deliverables
 - `llm_outputs.translated_reviews` — Batch API translations (39,946 reviews)
 - `llm_outputs.review_translations_final` — Combined translations from all sources (98,410 reviews)
 - `llm_outputs.review_sentiments` — Claude sentiment classifications (41,940 reviews)
+- Streamlit app with 3 interactive pages (sentiment explorer, seller intelligence, NL query)
 
 **[View Phase 4 detailed documentation →](phase4-llm/README.md)**
 
@@ -398,12 +405,19 @@ Key findings:
 * **Experiment Design** - Segmented modeling, correlated feature analysis, baseline comparison
 
 ### NLP & Applied AI:
-* **LLM APIs** - Anthropic Claude (Haiku) for translation and sentiment classification
+* **LLM APIs** - Anthropic Claude (Haiku + Sonnet) for translation, sentiment classification, and NL-to-SQL
 * **Batch API Processing** - Asynchronous large-scale LLM inference at reduced cost
 * **Sentiment Analysis** - Multi-model comparison (VADER, TF-IDF classifiers, Word2Vec, GloVe, LSTM, LLM)
 * **Text Pre-processing** - Tokenization, lemmatization, stopword removal, TF-IDF vectorization
 * **Word Embeddings** - Domain-trained Word2Vec vs pretrained GloVe comparison
 * **Deep Learning** - LSTM sequence models with class weight balancing
+* **Natural Language Query** - LLM-powered SQL generation with schema context and business insight summarization
+
+### Interactive Applications:
+* **Streamlit** - Multi-page app with sentiment explorer, seller intelligence, and NL query interface
+* **Cross-Phase Integration** - Merging ML clustering (Phase 3) with LLM sentiment (Phase 4) into unified dashboards
+* **Real-Time ML Inference** - Live predictions from multiple models (VADER, TF-IDF, Word2Vec, GloVe, Claude) in-app
+* **Geographic Visualization** - Interactive Mapbox maps with metric-driven coloring
 
 ### Data Visualization & Business Intelligence:
 * **Tableau Public** - Advanced dashboard development

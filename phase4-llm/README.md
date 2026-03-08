@@ -1,9 +1,9 @@
 # Phase 4: Applied AI — NLP Sentiment Analysis
 
 ## Overview
-AI-powered review translation and sentiment analysis on the Olist Brazilian e-commerce dataset. Reviews are originally in Portuguese — we first translate them to English using Claude (Anthropic's LLM), then run multi-model sentiment analysis comparing traditional NLP techniques against LLM-based classification.
+AI-powered review translation, sentiment analysis, and interactive analytics on the Olist Brazilian e-commerce dataset. Reviews are originally in Portuguese — we first translate them to English using Claude (Anthropic's LLM), then run multi-model sentiment analysis comparing traditional NLP techniques against LLM-based classification. Results are surfaced through a Streamlit app with sentiment exploration, seller intelligence dashboards, and a natural language query interface.
 
-This phase builds on the clean data models from Phase 1 (dbt) and the shared DuckDB database used across all phases.
+This phase builds on the clean data models from Phase 1 (dbt), seller segmentation from Phase 3 (ML), and the shared DuckDB database used across all phases.
 
 ## Dataset
 - **98,410** unique reviews from the Olist e-commerce platform
@@ -29,6 +29,14 @@ phase4-llm/
 │   ├── 05_sentiment_analysis.ipynb        # Multi-model sentiment analysis
 │   ├── 06_batch_sentiment.ipynb           # LLM sentiment batch submission
 │   ├── 07_retrieve_sentiment_batch.ipynb  # LLM sentiment batch retrieval
+│   ├── streamlit_app.py                   # Streamlit app entry point
+│   ├── pages/
+│   │   ├── 01_sentiment_explorer.py       # Model leaderboard & live tester
+│   │   ├── 02_seller_intelligence.py      # Seller scorecard & analytics
+│   │   └── 03_nl_query.py                 # Natural language SQL query interface
+│   ├── utils/
+│   │   ├── db.py                          # DuckDB connection & query utilities
+│   │   └── models.py                      # ML model loading & prediction
 │   ├── short_review_lookup.csv            # Portuguese→English dictionary for short reviews
 │   └── download_models.py                 # GloVe + NLTK data downloader
 ├── screenshots/
@@ -165,6 +173,48 @@ Retrieves completed batch sentiment results and saves to DuckDB.
 
 ---
 
+## Streamlit App
+
+Interactive analytics application built on top of the translation and sentiment analysis pipeline. Combines outputs from Phase 3 (ML seller segmentation) and Phase 4 (LLM sentiment) into a unified dashboard.
+
+### Home (`streamlit_app.py`)
+
+Landing page with navigation to the three main features and an overview of the end-to-end pipeline across all phases.
+
+### 01 — Sentiment Explorer (`pages/01_sentiment_explorer.py`)
+
+Interactive sentiment model comparison tool with three tabs:
+
+- **Model Leaderboard** — Performance metrics (Accuracy, F1 Macro) for all 13+ sentiment models evaluated in the analysis notebooks
+- **Live Review Tester** — Paste any review or select an example, then see real-time predictions from all 5 approaches (VADER, TF-IDF + LinearSVC, Word2Vec, GloVe, Claude LLM) side by side
+- **Sentiment Distribution** — Distribution of Claude's sentiment labels across 41,818 translated reviews with stacked bar charts and KPI metrics
+
+### 02 — Seller Intelligence (`pages/02_seller_intelligence.py`)
+
+Seller scorecard dashboard merging Phase 3 K-Means clustering with Phase 4 sentiment analysis. Combines `ml_outputs.seller_clusters` with Claude sentiment classifications to provide a unified view of seller performance.
+
+- **Segment Analysis** — Average review score and sentiment by cluster (Top Performers, Mid-Tier, Small & Reliable, Underperformers); scatter plot of delivery days vs sentiment score
+- **Geographic Distribution** — Interactive Mapbox map of seller locations colored by selected metric; state-level and regional aggregations
+- **Scorecard** — Filterable table of all sellers with metrics: cluster, total orders, average review score, sentiment score, delivery days, and positive/neutral/negative review counts
+- **Seller Deep Dive** — Individual seller lookup with detailed metrics, sentiment breakdown pie chart, and location map
+
+### 03 — Natural Language Query (`pages/03_nl_query.py`)
+
+Claude-powered natural language interface for querying the Olist dataset.
+
+- Takes plain English questions about the data (e.g., "Which product categories have the most negative sentiment?")
+- Uses Claude Sonnet to generate SQL from the question, with full database schema context dynamically pulled from DuckDB's `information_schema`
+- Executes the generated SQL against DuckDB and displays results
+- Claude then provides 2-3 sentence business insights explaining the results
+- Includes 7 example questions covering product categories, seller performance, delivery correlations, regional sentiment, and freight cost analysis
+
+### Utilities
+
+- **`utils/db.py`** — Cached DuckDB connection (read-only), query execution, and schema introspection
+- **`utils/models.py`** — Loads and caches all trained ML models (VADER, TF-IDF vectorizer + LinearSVC, Word2Vec + LinearSVC, GloVe + LinearSVC) with text preprocessing and prediction functions
+
+---
+
 ## Pipeline Integration
 
 LLM outputs are written directly to the shared DuckDB database (`llm_outputs` schema):
@@ -173,4 +223,4 @@ LLM outputs are written directly to the shared DuckDB database (`llm_outputs` sc
 - **`llm_outputs.review_sentiments`** — Claude sentiment classifications (41,940 reviews)
 
 ## Tech Stack
-Python, Anthropic Claude API (Haiku), DuckDB, Pandas, NumPy, Scikit-learn, NLTK, VADER, TensorFlow/Keras (LSTM), Gensim (Word2Vec), GloVe, Plotly, Docker, Jupyter
+Python, Anthropic Claude API (Haiku + Sonnet), Streamlit, DuckDB, Pandas, NumPy, Scikit-learn, NLTK, VADER, TensorFlow/Keras (LSTM), Gensim (Word2Vec), GloVe, Plotly, Docker, Jupyter
