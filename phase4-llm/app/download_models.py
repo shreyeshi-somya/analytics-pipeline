@@ -1,6 +1,7 @@
 import gensim.downloader as api
 import nltk
 import os
+import sys
 
 # Download GloVe vectors
 GLOVE_PATH = '/app/data/glove_wiki_gigaword_100.model'
