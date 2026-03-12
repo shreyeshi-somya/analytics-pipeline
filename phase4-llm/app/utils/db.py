@@ -1,8 +1,9 @@
 import duckdb
 import pandas as pd
 import streamlit as st
-
+import sys
 import os
+
 token = os.getenv('MOTHERDUCK_TOKEN')
 api_key = os.getenv('ANTHROPIC_API_KEY')
 

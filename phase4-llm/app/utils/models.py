@@ -5,6 +5,7 @@ from gensim.models import Word2Vec
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import streamlit as st
 import nltk
+import sys
 
 # Download NLTK data if not present
 nltk.download('wordnet', quiet=True)
