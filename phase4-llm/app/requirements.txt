@@ -1,6 +1,6 @@
 streamlit
 anthropic>=0.40.0
-duckdb[motherduck]
+duckdb[motherduck]==1.4.4
 pandas
 plotly
 python-dotenv
